@@ -1,0 +1,35 @@
+{
+  "name": "next-plugin-mdx-enhanced",
+  "description": "nextjs plugin for rendering mdx with layouts and front matter",
+  "version": "0.0.0",
+  "author": "Jeff Escalante",
+  "bugs": {
+    "url": "https://github.com/hashicorp/next-plugin-mdx-enhanced/issues"
+  },
+  "homepage": "https://github.com/hashicorp/next-plugin-mdx-enhanced#readme",
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/fixtures/"
+    ]
+  },
+  "keywords": [
+    "mdx",
+    "nextjs",
+    "plugin"
+  ],
+  "license": "MPL-2.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hashicorp/next-plugin-mdx-enhanced.git"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "next": "^8.1.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  }
+}

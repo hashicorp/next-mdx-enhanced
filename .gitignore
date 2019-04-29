@@ -1,0 +1,3 @@
+node_modules
+__tests__/fixtures/*/.next
+__tests__/fixtures/*/out
