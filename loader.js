@@ -1,13 +1,13 @@
-import path from 'path'
-import glob from 'glob'
-import matter from 'gray-matter'
-import stringifyObject from 'stringify-object'
-import { getOptions } from 'loader-utils'
+const path = require('path')
+const glob = require('glob')
+const matter = require('gray-matter')
+const stringifyObject = require('stringify-object')
+const { getOptions } = require('loader-utils')
 
 // Loads markdown files with front matter and renders them into a layout.
 // Layout can be set using the `layout` key in the front matter, and will map
 // to a file name in the pages/layouts directory.
-export default function(src) {
+module.exports = function mdxEnhancedLoader(src) {
   const options = getOptions(this)
 
   // Parse the front matter
@@ -23,8 +23,8 @@ export default function(src) {
     ''
   )
 
-  // Layouts are always resolved from "pages/layouts" for consistency.
-  const layoutPath = path.resolve(options.dir, 'pages/layouts', data.layout)
+  // Layouts are always resolved from "layouts" for consistency.
+  const layoutPath = path.resolve(options.dir, 'layouts', data.layout)
 
   // If the layout doesn't exist, throw a descriptive error
   // We use glob to check for existence, since the file could have multiple page

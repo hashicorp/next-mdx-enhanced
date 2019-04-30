@@ -1,6 +1,6 @@
-import path from 'path'
+const path = require('path')
 
-export default (nextConfig = {}) => {
+module.exports = (nextConfig = {}) => {
   // We want to add "mdx" to the page extensions but also don't want to
   // clobber any pre-existing extensions configured.
   if (!nextConfig.pageExtensions) {

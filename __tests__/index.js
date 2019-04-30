@@ -12,6 +12,27 @@ jest.setTimeout(10000)
 test('works', async () => {
   const outPath = await compileNextjs(basicFixture, nextConfig)
   expectContentMatch(outPath, 'index.html', /Hello world/)
+  expectContentMatch(
+    outPath,
+    'docs/advanced/index.html',
+    /<p>LAYOUT TEMPLATE<\/p>/
+  )
+  expectContentMatch(
+    outPath,
+    'docs/advanced/index.html',
+    /<h1>Advanced Docs<\/h1>/
+  )
+  expectContentMatch(
+    outPath,
+    'docs/intro/index.html',
+    /<p>LAYOUT TEMPLATE<\/p>/
+  )
+  expectContentMatch(outPath, 'docs/intro/index.html', /<h1>Intro Docs<\/h1>/)
+  expectContentMatch(
+    outPath,
+    'docs/intro/index.html',
+    /some <em>introductory<\/em> docs content/
+  )
 })
 
 // Test Utilities
