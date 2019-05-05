@@ -8,7 +8,7 @@ const basicFixture = path.join(__dirname, 'fixtures/basic')
 // increase timeout since these are integration tests
 jest.setTimeout(10000)
 
-test('works', async () => {
+test('basic integration test', async () => {
   const outPath = await compileNextjs(basicFixture)
   expectContentMatch(outPath, 'index.html', /Hello world/)
   expectContentMatch(

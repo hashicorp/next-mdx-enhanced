@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`transforms as intended 1`] = `
+"import something from \\"/Users/jeff/Sites/next-plugin-mdx-enhanced/__tests__/.next/__mdx-front-matter/8258d03b9c8141dcd2c3a3edba9900d5.json\\";
+import a, { c as d } from './foo.mdx';
+import b from \\"/Users/jeff/Sites/next-plugin-mdx-enhanced/__tests__/.next/__mdx-front-matter/8258d03b9c8141dcd2c3a3edba9900d5.json\\";"
+`;
