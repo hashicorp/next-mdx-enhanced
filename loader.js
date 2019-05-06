@@ -41,7 +41,7 @@ module.exports = async function mdxEnhancedLoader(src) {
 async function extractFrontmatter(options, frontMatter, resourcePath) {
   const frontmatterPath = generateFrontmatterPath(this.resourcePath, options)
   await fs.ensureDir(path.dirname(frontmatterPath))
-  this.emitFile(frontmatterPath, 'foo')
+  await fs.writeFile(frontmatterPath, JSON.stringify(frontMatter))
 }
 
 function processLayout(options, frontMatter, resourcePath, content) {

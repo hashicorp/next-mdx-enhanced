@@ -1,4 +1,5 @@
-import { frontMatter as introFm } from '../pages/docs/intro.mdx'
+import { frontMatter as introData } from '../pages/docs/intro.mdx'
+import { frontMatter as advancedData } from '../pages/docs/advanced.mdx'
 
 export default frontMatter => {
   return function docsPageLayout({ children }) {
@@ -6,7 +7,9 @@ export default frontMatter => {
       <>
         <p>LAYOUT TEMPLATE</p>
         <h1>{frontMatter.title}</h1>
-        <p>Other docs: {introFm.title}</p>
+        <p>
+          Other docs: {introData.title}, {advancedData.title}
+        </p>
         {children}
       </>
     )

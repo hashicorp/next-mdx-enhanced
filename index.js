@@ -38,7 +38,7 @@ module.exports = function mdxEnhancedPlugin(pluginOptions = {}) {
         // Webpack does not process files in a specific order, but we must guarantee that
         // frontmatter has all been extracted before files that could potentially require it
         // are evaluated through the loader. More details in the plugin source.
-        // config.plugins.push(new frontmatterExtractPlugin(options))
+        config.plugins.push(new frontmatterExtractPlugin(options))
 
         // Inject the frontmatter extraction babel plugin
         config.module.rules = config.module.rules.map(rule => {
