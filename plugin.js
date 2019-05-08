@@ -27,20 +27,39 @@ module.exports = class MdxFrontmatterExtractionPlugin {
 
     // This hook only runs in watch mode
     compiler.hooks.watchRun.tapPromise('MdxFrontmatterPlugin', compilation => {
-      return new Promise((resolve, reject) => {
-        const root = compilation.context
-        // when nextjs is in dev mode, it runs a server and client side webpack build
-        // we only need to extract the front matter once, so we arbitrarily pick the
-        // client compilation pass to run this for.
-        if (compilation.name === 'client') {
-          const webpackFd = compilation._lastCompilationFileDependencies
-          const changedFiles = webpackFd
-            ? [...webpackFd].filter(f => !f.match(/node_modules/))
-            : []
-          changedFiles.map(f => console.log(`Changed: ${f}`))
-        }
-        resolve()
-      })
+      // when nextjs is in dev mode, it runs a server and client side webpack build
+      // we only need to extract the front matter once, so we arbitrarily pick the
+      // client compilation pass to run this for.
+      if (compilation.name !== 'client') return Promise.resolve()
+
+      // Otherwise, let's do the thing
+      const webpackFd = compilation._lastCompilationFileDependencies
+      const changedFiles = webpackFd
+        ? [...webpackFd].filter(f => !f.match(/node_modules/))
+        : []
+      changedFiles.map(f => console.log(`Changed: ${f}`))
+      const changedMdx = changedFiles.filter(f => f.match(/\.mdx$/))
+      return extractFrontMatter.call(this, compilation.context, changedMdx)
     })
   }
+}
+
+function extractFrontMatter(root, files) {
+  return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
+    .then(fileContents => {
+      const fmPaths = fileContents.map(f =>
+        generateFrontmatterPath(f, this.nextConfig)
+      )
+      const frontMatter = fileContents.map(content => matter(content).data)
+      return Promise.all(
+        fmPaths.map(fmPath => fs.ensureDir(path.dirname(fmPath)))
+      ).then(() => [frontMatter, fmPaths])
+    })
+    .then(([contents, fmPaths]) => {
+      return Promise.all(
+        contents.map((content, idx) => {
+          fs.writeFile(fmPaths[idx], JSON.stringify(content))
+        })
+      )
+    })
 }

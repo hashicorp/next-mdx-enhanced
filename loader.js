@@ -1,10 +1,5 @@
-const fs = require('fs-extra')
-const path = require('path')
-const glob = require('glob')
-const matter = require('gray-matter')
 const stringifyObject = require('stringify-object')
 const { getOptions } = require('loader-utils')
-const { generateFrontmatterPath } = require('./util')
 
 // Loads markdown files with front matter and renders them into a layout.
 // Layout can be set using the `layout` key in the front matter, and will map
@@ -30,18 +25,11 @@ module.exports = async function mdxEnhancedLoader(src) {
   // only, because it returns the content we want to replace the file with, where the
   // front matter extraction function just writes a file out.
   Promise.all([
-    extractFrontmatter.call(this, options, data, resourcePath),
+    Promise.resolve(),
     processLayout.call(this, options, data, resourcePath, content)
   ])
     .then(([_, result]) => callback(null, result))
     .catch(err => callback(err))
-}
-
-//
-async function extractFrontmatter(options, frontMatter, resourcePath) {
-  const frontmatterPath = generateFrontmatterPath(this.resourcePath, options)
-  await fs.ensureDir(path.dirname(frontmatterPath))
-  await fs.writeFile(frontmatterPath, JSON.stringify(frontMatter))
 }
 
 function processLayout(options, frontMatter, resourcePath, content) {
