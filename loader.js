@@ -1,3 +1,6 @@
+const path = require('path')
+const matter = require('gray-matter')
+const glob = require('glob')
 const stringifyObject = require('stringify-object')
 const { getOptions } = require('loader-utils')
 
@@ -24,11 +27,9 @@ module.exports = async function mdxEnhancedLoader(src) {
   // Whenever they are both complete, we can move on. We return the results of processLayout
   // only, because it returns the content we want to replace the file with, where the
   // front matter extraction function just writes a file out.
-  Promise.all([
-    Promise.resolve(),
-    processLayout.call(this, options, data, resourcePath, content)
-  ])
-    .then(([_, result]) => callback(null, result))
+  processLayout
+    .call(this, options, data, resourcePath, content)
+    .then(result => callback(null, result))
     .catch(err => callback(err))
 }
 

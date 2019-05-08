@@ -1,7 +1,10 @@
 const fs = require('fs-extra')
 const path = require('path')
-const { generateFrontmatterPath } = require('./util')
 const matter = require('gray-matter')
+const { generateFrontmatterPath } = require('./util')
+const { promisify } = require('util')
+const globCb = require('glob')
+const glob = promisify(globCb)
 
 module.exports = class MdxFrontmatterExtractionPlugin {
   constructor(options) {
@@ -11,18 +14,7 @@ module.exports = class MdxFrontmatterExtractionPlugin {
   apply(compiler) {
     // This hook only runs on a single build
     compiler.hooks.run.tapPromise('MdxFrontmatterPlugin', compilation => {
-      return new Promise((resolve, reject) => {
-        const root = compilation.context
-        // read all the mdx files with glob
-        // pull all the front matter
-        // we should memory-cache these results
-        // write out the front matter to files based on the hashed paths
-        // we should be set
-        setTimeout(() => {
-          console.log('webpack run hook complete')
-          resolve()
-        }, 3000)
-      })
+      return this.getAllMdxPaths(compilation.context)
     })
 
     // This hook only runs in watch mode
@@ -39,27 +31,34 @@ module.exports = class MdxFrontmatterExtractionPlugin {
         : []
       changedFiles.map(f => console.log(`Changed: ${f}`))
       const changedMdx = changedFiles.filter(f => f.match(/\.mdx$/))
-      return extractFrontMatter.call(this, compilation.context, changedMdx)
+      return this.extractFrontMatter(changedMdx)
     })
   }
-}
 
-function extractFrontMatter(root, files) {
-  return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
-    .then(fileContents => {
-      const fmPaths = fileContents.map(f =>
-        generateFrontmatterPath(f, this.nextConfig)
-      )
-      const frontMatter = fileContents.map(content => matter(content).data)
-      return Promise.all(
-        fmPaths.map(fmPath => fs.ensureDir(path.dirname(fmPath)))
-      ).then(() => [frontMatter, fmPaths])
-    })
-    .then(([contents, fmPaths]) => {
-      return Promise.all(
-        contents.map((content, idx) => {
-          fs.writeFile(fmPaths[idx], JSON.stringify(content))
-        })
-      )
-    })
+  getAllMdxPaths(root) {
+    return glob('pages/**/*.mdx', { cwd: root }).then(files =>
+      this.extractFrontMatter(files.map(f => path.join(root, f)))
+    )
+  }
+
+  // Given an array of absolute file paths, write out the front matter to a json file
+  extractFrontMatter(files) {
+    return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
+      .then(fileContents => {
+        const fmPaths = files.map(f =>
+          generateFrontmatterPath(f, this.nextConfig)
+        )
+        const frontMatter = fileContents.map(content => matter(content).data)
+        return Promise.all(
+          fmPaths.map(fmPath => fs.ensureDir(path.dirname(fmPath)))
+        ).then(() => [frontMatter, fmPaths])
+      })
+      .then(([contents, fmPaths]) => {
+        return Promise.all(
+          contents.map((content, idx) => {
+            fs.writeFile(fmPaths[idx], JSON.stringify(content))
+          })
+        )
+      })
+  }
 }
