@@ -29,14 +29,17 @@ module.exports = class MdxFrontmatterExtractionPlugin {
     compiler.hooks.watchRun.tapPromise('MdxFrontmatterPlugin', compilation => {
       return new Promise((resolve, reject) => {
         const root = compilation.context
-        // can we get the file(s) that changed off the compiler or compilation object?
-        // if not, dive into compilation hooks and see if we can find one thats async
-        // and reliably runs before modules resolve that will give it to us
-        // once we have the changed file, do the front matter write for just that file
-        setTimeout(() => {
-          console.log('webpack watchRun hook complete')
-          resolve()
-        }, 3000)
+        // when nextjs is in dev mode, it runs a server and client side webpack build
+        // we only need to extract the front matter once, so we arbitrarily pick the
+        // client compilation pass to run this for.
+        if (compilation.name === 'client') {
+          const webpackFd = compilation._lastCompilationFileDependencies
+          const changedFiles = webpackFd
+            ? [...webpackFd].filter(f => !f.match(/node_modules/))
+            : []
+          changedFiles.map(f => console.log(`Changed: ${f}`))
+        }
+        resolve()
       })
     })
   }
