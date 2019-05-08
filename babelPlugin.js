@@ -19,7 +19,7 @@ module.exports = function nextBabelWrapper(nextConfig) {
           )
           if (!frontMatterSpecifier) return
 
-          // front matter is extracted and written out by the loader to .next/frontMatter/<filePathHashed>
+          // front matter is extracted and written out by the loader to .next/__mdx-front-matter/<filePathHashed>.json
           // here, we're calculating the path
           const currentPath = state.file.opts.filename
           const frontMatterPath = generateFrontmatterPath(
