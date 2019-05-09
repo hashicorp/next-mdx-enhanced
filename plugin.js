@@ -9,39 +9,75 @@ const glob = promisify(globCb)
 module.exports = class MdxFrontmatterExtractionPlugin {
   constructor(options) {
     this.nextConfig = options
+    this.firstRun = true
   }
 
   apply(compiler) {
     // This hook only runs on a single build
     compiler.hooks.run.tapPromise('MdxFrontmatterPlugin', compilation => {
-      return this.getAllMdxPaths(compilation.context)
+      return this.getAllMdxFilesAndExtractFrontmatter(compilation.context)
     })
 
     // This hook only runs in watch mode
     compiler.hooks.watchRun.tapPromise('MdxFrontmatterPlugin', compilation => {
-      // when nextjs is in dev mode, it runs a server and client side webpack build
+      // On the first run for watch, we need to do an initial front matter extraction
+      if (this.firstRun) {
+        this.firstRun = false
+        compiler.watchFileSystem.watcher.on('change', () => {
+          console.log('something happened')
+        })
+        return this.getAllMdxFilesAndExtractFrontmatter(compilation.context)
+      }
+
+      // When nextjs is in dev mode, it runs a server and client side webpack build
       // we only need to extract the front matter once, so we arbitrarily pick the
       // client compilation pass to run this for.
       if (compilation.name !== 'client') return Promise.resolve()
 
-      // Otherwise, let's do the thing
+      // Get the files changed since the last compilation via webpack
       const webpackFd = compilation._lastCompilationFileDependencies
-      const changedFiles = webpackFd
-        ? [...webpackFd].filter(f => !f.match(/node_modules/))
-        : []
-      changedFiles.map(f => console.log(`Changed: ${f}`))
-      const changedMdx = changedFiles.filter(f => f.match(/\.mdx$/))
-      return this.extractFrontMatter(changedMdx)
+
+      // // Filter out any dependencies up the chain in node modules, as it is unlikely
+      // // that these will be our own mdx pages. The `webpackFd` variable is a SortableSet,
+      // // so we coerce it into an array so we can filter it.
+      // const changedFiles = webpackFd ? [[...webpackFd][0]] : []
+
+      // console.log(changedFiles)
+
+      // // Pare down changed files to only mdx files
+      // const changedMdx = changedFiles.filter(f => f.match(/\.mdx$/))
+
+      // // Extract the front matter!
+      // return this.extractFrontMatter(changedMdx)
+      return Promise.resolve()
+    })
+
+    // This hook runs in both modes, as webpack is finising up
+    compiler.hooks.emit.tapAsync('MdxFrontmatterPlugin', (compilation, cb) => {
+      // If there's an import like `import {frontMatter} from './foo.mdx', this gets
+      // rewritten to `import frontMatter from './9832h92.json'`, which is the purpose
+      // of this plugin. However, webpack is then unaware that `./foo.mdx` is a dependency,
+      // so when it changes, watch mode will not recompile. So here, we will re-add any mdx
+      // files that are not present, so we get the "livereload" effect.
+      // TODO: This does not handle the case where a new mdx file is added while watching
+
+      // this.projectMdxFiles.map(mdxFile => {
+      //   compilation.fileDependencies.add(mdxFile)
+      // })
+      cb()
     })
   }
 
-  getAllMdxPaths(root) {
-    return glob('pages/**/*.mdx', { cwd: root }).then(files =>
-      this.extractFrontMatter(files.map(f => path.join(root, f)))
-    )
+  // Gets all mdx files that are in the `<root>/pages` directory, recursively, and
+  // writes out all their front matter.
+  getAllMdxFilesAndExtractFrontmatter(root) {
+    return glob('pages/**/*.mdx', { cwd: root }).then(files => {
+      this.projectMdxFiles = files.map(f => path.join(root, f))
+      this.extractFrontMatter(this.projectMdxFiles)
+    })
   }
 
-  // Given an array of absolute file paths, write out the front matter to a json file
+  // Given an array of absolute file paths, write out the front matter to a json file.
   extractFrontMatter(files) {
     return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
       .then(fileContents => {

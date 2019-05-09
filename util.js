@@ -5,10 +5,7 @@ module.exports.generateFrontmatterPath = function generateFrontmatterPath(
   filePath,
   nextConfig
 ) {
-  return path.join(
-    nextConfig.dir,
-    `.next/__mdx-front-matter/${md5(filePath)}.json`
-  )
+  return path.join(nextConfig.dir, `__mdx-front-matter/${md5(filePath)}.json`)
 }
 
 // md5 hash a string
