@@ -5,7 +5,6 @@ const { generateFrontmatterPath } = require('./util')
 const { promisify } = require('util')
 const globCb = require('glob')
 const glob = promisify(globCb)
-
 module.exports = class MdxFrontmatterExtractionPlugin {
   constructor(options) {
     this.nextConfig = options
@@ -23,9 +22,6 @@ module.exports = class MdxFrontmatterExtractionPlugin {
       // On the first run for watch, we need to do an initial front matter extraction
       if (this.firstRun) {
         this.firstRun = false
-        compiler.watchFileSystem.watcher.on('change', () => {
-          console.log('something happened')
-        })
         return this.getAllMdxFilesAndExtractFrontmatter(compilation.context)
       }
 
@@ -35,21 +31,15 @@ module.exports = class MdxFrontmatterExtractionPlugin {
       if (compilation.name !== 'client') return Promise.resolve()
 
       // Get the files changed since the last compilation via webpack
-      const webpackFd = compilation._lastCompilationFileDependencies
+      const changedFiles = compilation.watchFileSystem.watcher.mtimes
 
-      // // Filter out any dependencies up the chain in node modules, as it is unlikely
-      // // that these will be our own mdx pages. The `webpackFd` variable is a SortableSet,
-      // // so we coerce it into an array so we can filter it.
-      // const changedFiles = webpackFd ? [[...webpackFd][0]] : []
+      // Pare down changed files to only mdx files
+      const changedMdx = Object.keys(changedFiles).filter(f =>
+        f.match(/\.mdx$/)
+      )
 
-      // console.log(changedFiles)
-
-      // // Pare down changed files to only mdx files
-      // const changedMdx = changedFiles.filter(f => f.match(/\.mdx$/))
-
-      // // Extract the front matter!
-      // return this.extractFrontMatter(changedMdx)
-      return Promise.resolve()
+      // Extract the front matter!
+      return this.extractFrontMatter(changedMdx)
     })
 
     // This hook runs in both modes, as webpack is finising up
@@ -59,11 +49,13 @@ module.exports = class MdxFrontmatterExtractionPlugin {
       // of this plugin. However, webpack is then unaware that `./foo.mdx` is a dependency,
       // so when it changes, watch mode will not recompile. So here, we will re-add any mdx
       // files that are not present, so we get the "livereload" effect.
+
       // TODO: This does not handle the case where a new mdx file is added while watching
 
-      // this.projectMdxFiles.map(mdxFile => {
-      //   compilation.fileDependencies.add(mdxFile)
-      // })
+      this.projectMdxFiles.map(mdxFile => {
+        compilation.fileDependencies.add(mdxFile)
+      })
+
       cb()
     })
   }
