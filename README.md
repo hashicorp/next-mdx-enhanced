@@ -4,11 +4,11 @@ Have you ever found yourself using nextjs with [mdx](https://mdxjs.org) but crav
 
 ## Installation
 
-Start with `npm i @hashicorp/next-plugin-mdx-enhanced`. You can then instantiate it as a webpack plugin as such:
+Start with `npm i next-mdx-enhanced`. You can then instantiate it as a webpack plugin as such:
 
 ```js
 // next.config.js
-const withMdxEnhanced = require('@hashicorp/next-plugin-mdx-enhanced)
+const withMdxEnhanced = require('next-mdx-enhanced)
 
 
 module.exports = withMdxEnhanced(/* options, see below */)(/* your normal nextjs config */)

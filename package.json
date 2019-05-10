@@ -1,5 +1,5 @@
 {
-  "name": "next-plugin-mdx-enhanced",
+  "name": "next-mdx-enhanced",
   "description": "nextjs plugin for rendering mdx with layouts and front matter",
   "version": "0.0.0",
   "author": "Jeff Escalante",
@@ -7,6 +7,7 @@
     "url": "https://github.com/hashicorp/next-plugin-mdx-enhanced/issues"
   },
   "dependencies": {
+    "@babel/core": "^7.4.4",
     "@mdx-js/loader": "^1.0.15",
     "fs-extra": "^7.0.1",
     "glob": "^7.1.3",
