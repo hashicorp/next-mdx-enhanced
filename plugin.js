@@ -3,8 +3,7 @@ const path = require('path')
 const matter = require('gray-matter')
 const { generateFrontmatterPath } = require('./util')
 const { promisify } = require('util')
-const globCb = require('glob')
-const glob = promisify(globCb)
+const glob = promisify(require('glob'))
 module.exports = class MdxFrontmatterExtractionPlugin {
   constructor(options) {
     this.nextConfig = options
@@ -42,7 +41,7 @@ module.exports = class MdxFrontmatterExtractionPlugin {
       if (!changedMdx.length) return Promise.resolve()
 
       // Extract the front matter!
-      return this.extractFrontMatter(changedMdx)
+      return this.extractFrontMatter(changedMdx, compilation.context)
     })
 
     // This hook runs in both modes, as webpack is finising up

@@ -3,8 +3,6 @@ import { frontMatter as advancedData } from '../pages/docs/advanced.mdx'
 
 export default frontMatter => {
   return function docsPageLayout({ children }) {
-    console.log('running the layout')
-
     return (
       <>
         <p>LAYOUT TEMPLATE</p>
