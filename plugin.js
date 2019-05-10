@@ -83,7 +83,7 @@ module.exports = class MdxFrontmatterExtractionPlugin {
         const frontMatter = fileContents.map((content, idx) => {
           return {
             ...matter(content).data,
-            __resourcePath: files[idx].replace(root, '')
+            __resourcePath: files[idx].replace(path.join(root, 'pages'), '')
           }
         })
         return Promise.all(
