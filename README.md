@@ -14,6 +14,8 @@ const withMdxEnhanced = require('@hashicorp/next-plugin-mdx-enhanced)
 module.exports = withMdxEnhanced(/* options, see below */)(/* your normal nextjs config */)
 ```
 
+Also, make sure to add `.mdx-data` to your `.gitignore` file, this is a directory generated as part of the optimization process for this plugin.
+
 ## Usage
 
 Let's get right into an example. Say you have set up the plugin as above, and you have site for displaying some docs (or blog, etc) that you're working on that looks like this:
