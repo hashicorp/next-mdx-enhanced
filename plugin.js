@@ -38,6 +38,7 @@ module.exports = class MdxFrontmatterExtractionPlugin {
         f.match(/\.mdx$/)
       )
 
+      // If there aren't any mdx files, exit early
       if (!changedMdx.length) return Promise.resolve()
 
       // Extract the front matter!
@@ -67,18 +68,24 @@ module.exports = class MdxFrontmatterExtractionPlugin {
   getAllMdxFilesAndExtractFrontmatter(root) {
     return glob('pages/**/*.mdx', { cwd: root }).then(files => {
       this.projectMdxFiles = files.map(f => path.join(root, f))
-      this.extractFrontMatter(this.projectMdxFiles)
+      this.extractFrontMatter(this.projectMdxFiles, root)
     })
   }
 
   // Given an array of absolute file paths, write out the front matter to a json file.
-  extractFrontMatter(files) {
+  extractFrontMatter(files, root) {
     return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
       .then(fileContents => {
         const fmPaths = files.map(f =>
           generateFrontmatterPath(f, this.nextConfig)
         )
-        const frontMatter = fileContents.map(content => matter(content).data)
+        // extract front matter, add __resourcePath
+        const frontMatter = fileContents.map((content, idx) => {
+          return {
+            ...matter(content).data,
+            __resourcePath: files[idx].replace(root, '')
+          }
+        })
         return Promise.all(
           fmPaths.map(fmPath => fs.ensureDir(path.dirname(fmPath)))
         ).then(() => [frontMatter, fmPaths])
