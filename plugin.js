@@ -38,6 +38,8 @@ module.exports = class MdxFrontmatterExtractionPlugin {
         f.match(/\.mdx$/)
       )
 
+      if (!changedMdx.length) return Promise.resolve()
+
       // Extract the front matter!
       return this.extractFrontMatter(changedMdx)
     })
