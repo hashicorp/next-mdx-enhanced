@@ -14,35 +14,29 @@ module.exports = async function mdxEnhancedLoader(src) {
   // Parse the front matter
   const { content, data } = matter(src)
 
-  // Sometimes it's important to know the file path within the layout, we add this
-  // as a special prop to the front matter, __resourcePath.
-  const resourcePath = this.resourcePath.replace(
-    path.join(this.rootContext, 'pages'),
-    ''
-  )
-
-  // We have two things we need to do in parallel here:
-  // - extract the front matter and write it out to its own file
-  // - check if there's a layout, if there is, resolve the layout and wrap the content
-  // Whenever they are both complete, we can move on. We return the results of processLayout
-  // only, because it returns the content we want to replace the file with, where the
-  // front matter extraction function just writes a file out.
-  processLayout
-    .call(this, options, data, resourcePath, content)
-    .then(result => callback(null, result))
-    .catch(err => callback(err))
+  // For error logs
+  const resourcePath =
+    // Checks if there's a layout, if there is, resolve the layout and wrap the content in it.
+    processLayout
+      .call(this, options, data, content)
+      .then(result => callback(null, result))
+      .catch(err => callback(err))
 }
 
-function processLayout(options, frontMatter, resourcePath, content) {
+function processLayout(options, frontMatter, content) {
   return new Promise((resolve, reject) => {
-    // If no layout is provided, return the content directly.
-    if (!frontMatter.layout) return resolve(content)
+    // If no layout is provided and the default layout setting is not on, return the
+    // content directly.
+    if (!frontMatter.layout && !options.mdxEnhancedPluginOptions.defaultLayout)
+      return resolve(content)
 
-    // Layouts default to resolving from "<root>/layouts", but this is configurable
+    // Layouts default to resolving from "<root>/layouts", but this is configurable.
+    // If the frontMatter doesn't have a layout and defaultLayout is true, try to
+    // resolve the index file within the layouts path.
     const layoutPath = path.resolve(
       options.dir,
       options.mdxEnhancedPluginOptions.layoutPath,
-      frontMatter.layout
+      frontMatter.layout || 'index'
     )
 
     // If the layout doesn't exist, throw a descriptive error
@@ -55,7 +49,10 @@ function processLayout(options, frontMatter, resourcePath, content) {
       if (err) return reject(err)
       if (!matches.length) {
         throw new Error(
-          `File "${resourcePath}" specified "${
+          `File "${this.resourcePath.replace(
+            path.join(this.rootContext, 'pages'),
+            ''
+          )}" specified "${
             frontMatter.layout
           }" as its layout, but no matching file was found at "${layoutMatcher}"`
         )

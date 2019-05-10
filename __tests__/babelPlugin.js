@@ -3,7 +3,7 @@ const fs = require('fs')
 const { transform } = require('@babel/core')
 const plugin = require('../babelPlugin')
 
-test.skip('transforms as intended', () => {
+test('transforms as intended', () => {
   const mockNextOptions = { dir: __dirname }
   const { content, filename } = loadFixture('basic')
   const { code } = transform(content, {
