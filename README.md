@@ -8,8 +8,7 @@ Start with `npm i next-mdx-enhanced`. You can then instantiate it as a webpack p
 
 ```js
 // next.config.js
-const withMdxEnhanced = require('next-mdx-enhanced)
-
+const withMdxEnhanced = require('next-mdx-enhanced')
 
 module.exports = withMdxEnhanced(/* options, see below */)(/* your normal nextjs config */)
 ```
