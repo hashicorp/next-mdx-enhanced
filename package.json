@@ -17,7 +17,8 @@
   "devDependencies": {
     "next": "^8.1.0",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "rmfr": "^2.0.0"
   },
   "homepage": "https://github.com/hashicorp/next-plugin-mdx-enhanced#readme",
   "jest": {

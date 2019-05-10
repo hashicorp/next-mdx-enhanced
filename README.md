@@ -51,17 +51,17 @@ title: 'Intro Page'
 Here's some *markdown* content!
 ```
 
-When the plugin sees the `layout` key, it will go looking by default in `/pages/layouts/{name}` -- so in this case, it will look for `/pages/layouts/docs-page` -- the extension can be any of the [pageExtensions](https://nextjs.org/docs#configuring-extensions-looked-for-when-resolving-pages-in-pages) you have configured. In this case, let's just use `.jsx`. Running this code will give you an error that the layout file was not found, so let's create it:
+When the plugin sees the `layout` key, it will go looking by default in `/layouts/{name}` -- so in this case, it will look for `/layouts/docs-page` -- the extension can be any of the [pageExtensions](https://nextjs.org/docs#configuring-extensions-looked-for-when-resolving-pages-in-pages) you have configured. In this case, let's just use `.jsx`. Running this code will give you an error that the layout file was not found, so let's create it:
 
 ```diff
 MyApp
 ├─ pages
 │  ├ index.jsx
-+│  ├ layouts
-+│    └ docs-page.jsx
 │  └ docs
 │    ├ intro.mdx
 │    └ advanced.mdx
++├─ layouts
++│  └ docs-page.jsx
 └ next.config.js
 ```
 
@@ -88,12 +88,12 @@ There are some additional config options here, let's take a look:
 
 ```js
 mdxEnhanced({
-  layoutsPath: 'pages/layouts',
+  layoutsPath: 'somePath/otherPath',
   defaultLayout: true
 })
 ```
 
-I mentioned earlier that this plugin looks in `/pages/layouts` -- you are welcome to change this via the option above. Additionally, toggling `defaultLayout` to `true` will make the plugin look for an `index.[extension]` layout file within the `layoutsPath` and use this for any `.mdx` file that a layout has not been specified for. This can help to save repetition if most of your pages implement the same layout.
+I mentioned earlier that this plugin looks in `/layouts` -- you are welcome to change this via the option above. Whatever you pass in will be resolved relative to the project root. Additionally, toggling `defaultLayout` to `true` will make the plugin look for an `index.[extension]` layout file within the `layoutsPath` and use this for any `.mdx` file that a layout has not been specified for. This can help to save repetition if most of your pages implement the same layout.
 
 ### On to Front Matter
 
@@ -105,11 +105,11 @@ Remember this file tree?
 MyApp
 ├─ pages
 │  ├ index.jsx
-│  ├ layouts
-│    └ docs-page.jsx
 │  └ docs
 │    ├ intro.mdx
 │    └ advanced.mdx
+├─ layouts
+│  └ docs-page.jsx
 └ next.config.js
 ```
 
@@ -160,7 +160,7 @@ export default () => {
 }
 
 function formatPath(p) {
-  return p.replace(/^\/pages\//, '').replace(/\.mdx$/, '')
+  return p.replace(/\.mdx$/, '')
 }
 ```
 
