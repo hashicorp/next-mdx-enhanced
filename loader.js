@@ -14,16 +14,19 @@ module.exports = async function mdxEnhancedLoader(src) {
   // Parse the front matter
   const { content, data } = matter(src)
 
-  // For error logs
-  const resourcePath =
-    // Checks if there's a layout, if there is, resolve the layout and wrap the content in it.
-    processLayout
-      .call(this, options, data, content)
-      .then(result => callback(null, result))
-      .catch(err => callback(err))
+  // Get file path relative to project root
+  const resourcePath = this.resourcePath
+    .replace(path.join(this.rootContext, 'pages'), '')
+    .substring(1)
+
+  // Checks if there's a layout, if there is, resolve the layout and wrap the content in it.
+  processLayout
+    .call(this, options, data, content, resourcePath)
+    .then(result => callback(null, result))
+    .catch(err => callback(err))
 }
 
-function processLayout(options, frontMatter, content) {
+function processLayout(options, frontMatter, content, resourcePath) {
   return new Promise((resolve, reject) => {
     // If no layout is provided and the default layout setting is not on, return the
     // content directly.
@@ -49,10 +52,7 @@ function processLayout(options, frontMatter, content) {
       if (err) return reject(err)
       if (!matches.length) {
         throw new Error(
-          `File "${this.resourcePath.replace(
-            path.join(this.rootContext, 'pages'),
-            ''
-          )}" specified "${
+          `File "${resourcePath}" specified "${
             frontMatter.layout
           }" as its layout, but no matching file was found at "${layoutMatcher}"`
         )
@@ -61,7 +61,9 @@ function processLayout(options, frontMatter, content) {
       // Import the layout, export the layout-wrapped content, pass front matter into layout
       return resolve(`import layout from '${layoutPath}'
 
-export default layout(${stringifyObject(frontMatter)})
+export default layout(${stringifyObject(
+        Object.assign({}, frontMatter, { __resourcePath: resourcePath })
+      )})
 
 ${content}
 `)
