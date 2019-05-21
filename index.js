@@ -69,6 +69,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   })
 }
 
+// Loop through webpack loader rules and determine where to inject custom babel plugin
 function addBabelPlugin(rules, plugin) {
   return rules.map(rule => {
     if (rule.use.loader === 'next-babel-loader') {
@@ -79,6 +80,7 @@ function addBabelPlugin(rules, plugin) {
   })
 }
 
+// Given an array of absolute file paths, write out the front matter to a json file
 function extractFrontMatter(files, root) {
   return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
     .then(fileContents => {
