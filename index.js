@@ -1,10 +1,23 @@
 const fs = require('fs')
 const matter = require('gray-matter')
 const path = require('path')
-const withPrebuild = require('@hashicorp/next-prebuild')
+const { PrebuildWebpackPlugin } = require('@hashicorp/prebuild-webpack-plugin')
 const { createConfigItem } = require('@babel/core')
+
 const { generateFrontmatterPath } = require('./util')
-const babelPluginFrontmatter = require('./plugin')
+const babelPluginFrontmatter = require('./babelPlugin')
+
+function addBabelPlugin(rules, options) {
+  rules.map(rule => {
+    if (rule.use.loader === 'next-babel-loader') {
+      if (!rule.use.options.plugins) rule.use.options.plugins = []
+      rule.use.options.plugins.push(
+        createConfigItem(babelPluginFrontmatter(options))
+      )
+    }
+    return rule
+  })
+}
 
 function extractFrontMatter(files, root) {
   return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
@@ -31,7 +44,7 @@ function extractFrontMatter(files, root) {
     })
 }
 
-const withEnhancedMdx = (pluginOptions = {}) => (nextConfig = {}) => {
+module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   if (!pluginOptions.layoutPath) pluginOptions.layoutPath = 'layouts'
 
   if (!nextConfig.pageExtensions) {
@@ -58,39 +71,28 @@ const withEnhancedMdx = (pluginOptions = {}) => (nextConfig = {}) => {
         ]
       })
 
-      config.module.rules = config.module.rules.map(rule => {
-        if (rule.use.loader === 'next-babel-loader') {
-          if (!rule.use.options.plugins) rule.use.options.plugins = []
-          rule.use.options.plugins.push(
-            createConfigItem(babelPluginFrontmatter(options))
-          )
-        }
-        return rule
-      })
+      config.module.rules = addBabelPlugin(config.module.rules, options)
 
       if (typeof nextConfig.webpack === 'function') {
         return nextConfig.webpack(config, options)
       }
 
+      config.plugins.push(
+        new PrebuildWebpackPlugin({
+          build: (_, compilation, files) => {
+            return extractFrontMatter(files, compilation.context)
+          },
+          watch: (_, compilation, files) => {
+            return extractFrontMatter(files, compilation.context)
+          },
+          files: {
+            pattern: 'pages/**/*.mdx',
+            addFilesAsDependencies: true
+          }
+        })
+      )
+
       return config
     }
   })
-}
-
-module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
-  return [
-    withPrebuild({
-      build: (_, compilation, files) => {
-        extractFrontMatter(files, compilation.context)
-      },
-      watch: (_, compilation, files) => {
-        extractFrontMatter(files, compilation.context)
-      },
-      files: {
-        pattern: 'pages/**/*.mdx',
-        addFilesAsDependencies: true
-      }
-    }),
-    withEnhancedMdx(pluginOptions)
-  ].reduce((acc, next) => next(acc), nextConfig)
 }
