@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs-extra')
 const matter = require('gray-matter')
 const path = require('path')
 const { PrebuildWebpackPlugin } = require('@hashicorp/prebuild-webpack-plugin')
@@ -8,7 +8,7 @@ const { generateFrontmatterPath } = require('./util')
 const babelPluginFrontmatter = require('./babelPlugin')
 
 function addBabelPlugin(rules, options) {
-  rules.map(rule => {
+  return rules.map(rule => {
     if (rule.use.loader === 'next-babel-loader') {
       if (!rule.use.options.plugins) rule.use.options.plugins = []
       rule.use.options.plugins.push(
@@ -22,9 +22,7 @@ function addBabelPlugin(rules, options) {
 function extractFrontMatter(files, root) {
   return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
     .then(fileContents => {
-      const fmPaths = files.map(f =>
-        generateFrontmatterPath(f, this.nextConfig)
-      )
+      const fmPaths = files.map(f => generateFrontmatterPath(f, root))
       const frontMatter = fileContents.map((content, idx) => {
         return {
           ...matter(content).data,
@@ -86,7 +84,8 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
             return extractFrontMatter(files, compilation.context)
           },
           files: {
-            pattern: 'pages/**/*.mdx',
+            pattern: '**/*.mdx',
+            options: { cwd: config.context },
             addFilesAsDependencies: true
           }
         })
