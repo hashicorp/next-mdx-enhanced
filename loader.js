@@ -33,13 +33,18 @@ function processLayout(options, frontMatter, content, resourcePath) {
     if (!frontMatter.layout && !options.mdxEnhancedPluginOptions.defaultLayout)
       return resolve(content)
 
+    // Set the default if the option is active and there's no layout
+    if (!frontMatter.layout && options.mdxEnhancedPluginOptions.defaultLayout) {
+      frontMatter.layout = 'index'
+    }
+
     // Layouts default to resolving from "<root>/layouts", but this is configurable.
     // If the frontMatter doesn't have a layout and defaultLayout is true, try to
     // resolve the index file within the layouts path.
     const layoutPath = path.resolve(
       options.dir,
       options.mdxEnhancedPluginOptions.layoutPath,
-      frontMatter.layout || 'index'
+      frontMatter.layout
     )
 
     // If the layout doesn't exist, throw a descriptive error
