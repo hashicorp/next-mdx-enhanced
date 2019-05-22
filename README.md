@@ -4,11 +4,11 @@ Have you ever found yourself using [Next.js](https://github.com/zeit/next.js) wi
 
 ## Installation
 
-Start with `npm i @hashicorp/next-mdx-enhanced`. You can then instantiate it as a Next.js plugin as such:
+Start with `npm i next-mdx-enhanced`. You can then instantiate it as a Next.js plugin as such:
 
 ```js
 // next.config.js
-const withMdxEnhanced = require('@hashicorp/next-mdx-enhanced')
+const withMdxEnhanced = require('next-mdx-enhanced')
 
 module.exports = withMdxEnhanced(/* options, see below */)(/* your normal nextjs config */)
 ```
@@ -88,7 +88,7 @@ There are some additional config options here, let's take a look:
 ```js
 mdxEnhanced({
   layoutsPath: 'somePath/otherPath',
-  defaultLayout: true
+  defaultLayout: true,
 })
 ```
 
