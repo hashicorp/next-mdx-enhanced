@@ -1,14 +1,14 @@
-# NextJS MDX Enhanced Plugin
+# Next.js + MDX Enhanced
 
 Have you ever found yourself using [Next.js](https://github.com/zeit/next.js) with [mdx](https://mdxjs.org) but craving the ability to use layouts for full mdx pages, and/or [front matter](https://jekyllrb.com/docs/front-matter/)? Well well my friend, you are in the right place, because that's exactly what this plugin will do for you! 🌟
 
 ## Installation
 
-Start with `npm i next-mdx-enhanced`. You can then instantiate it as a Next.js plugin as such:
+Start with `npm i @hashicorp/next-mdx-enhanced`. You can then instantiate it as a Next.js plugin as such:
 
 ```js
 // next.config.js
-const withMdxEnhanced = require('next-mdx-enhanced')
+const withMdxEnhanced = require('@hashicorp/next-mdx-enhanced')
 
 module.exports = withMdxEnhanced(/* options, see below */)(/* your normal nextjs config */)
 ```
