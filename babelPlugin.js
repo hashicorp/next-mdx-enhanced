@@ -24,7 +24,7 @@ module.exports = function nextBabelWrapper(nextConfig) {
           const currentPath = state.file.opts.filename
           const frontMatterPath = generateFrontmatterPath(
             path.resolve(path.dirname(currentPath), importPath),
-            nextConfig
+            nextConfig.dir
           )
 
           // now, we construct a new import statement
