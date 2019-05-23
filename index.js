@@ -30,17 +30,22 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
           {
             loader: path.join(__dirname, './loader'),
             options: Object.assign({}, options, {
-              mdxEnhancedPluginOptions: pluginOptions
-            })
-          }
-        ]
+              mdxEnhancedPluginOptions: pluginOptions,
+            }),
+          },
+        ],
       })
 
       // Add babel plugin to rewrite front matter imports
-      config.module.rules = addBabelPlugin(
-        config.module.rules,
-        babelPluginFrontmatter(options)
-      )
+      config.module.rules = config.module.rules.map(rule => {
+        if (rule.use.loader === 'next-babel-loader') {
+          if (!rule.use.options.plugins) rule.use.options.plugins = []
+          rule.use.options.plugins.push(
+            createConfigItem(babelPluginFrontmatter(options))
+          )
+        }
+        return rule
+      })
 
       // Add webpack plugin that extracts front matter
       config.plugins.push(
@@ -54,8 +59,8 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
           files: {
             pattern: '**/*.mdx',
             options: { cwd: config.context },
-            addFilesAsDependencies: true
-          }
+            addFilesAsDependencies: true,
+          },
         })
       )
 
@@ -65,18 +70,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
       }
 
       return config
-    }
-  })
-}
-
-// Loop through webpack loader rules and determine where to inject custom babel plugin
-function addBabelPlugin(rules, plugin) {
-  return rules.map(rule => {
-    if (rule.use.loader === 'next-babel-loader') {
-      if (!rule.use.options.plugins) rule.use.options.plugins = []
-      rule.use.options.plugins.push(createConfigItem(plugin))
-    }
-    return rule
+    },
   })
 }
 
@@ -88,7 +82,7 @@ function extractFrontMatter(files, root) {
       const frontMatter = fileContents.map((content, idx) => {
         return {
           ...matter(content).data,
-          __resourcePath: files[idx].replace(path.join(root, 'pages'), '')
+          __resourcePath: files[idx].replace(path.join(root, 'pages'), ''),
         }
       })
       return Promise.all(
