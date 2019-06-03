@@ -89,6 +89,7 @@ There are some additional config options here, let's take a look:
 mdxEnhanced({
   layoutsPath: 'somePath/otherPath',
   defaultLayout: true,
+  remarkPlugins: [], // Array of remark plugins -- https://mdxjs.com/advanced/plugins#using-remark-and-rehype-plugins
 })
 ```
 

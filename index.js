@@ -26,7 +26,10 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
         test: /\.mdx?$/,
         use: [
           options.defaultLoaders.babel,
-          '@mdx-js/loader',
+          {
+            loader: '@mdx-js/loader',
+            options: { remarkPlugins: pluginOptions.remarkPlugins || [] },
+          },
           {
             loader: path.join(__dirname, './loader'),
             options: Object.assign({}, options, {
