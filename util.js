@@ -1,6 +1,17 @@
 const path = require('path')
 const crypto = require('crypto')
 
+module.exports.extendFrontMatter = async function extendFrontMatter({
+  content,
+  phase,
+  extendFm,
+} = {}) {
+  if (!extendFm || !extendFm.process) return {}
+  if (extendFm.phase !== 'both' && extendFm.phase !== phase) return {}
+
+  return extendFm.process(content)
+}
+
 module.exports.generateFrontmatterPath = function generateFrontmatterPath(
   filePath,
   root

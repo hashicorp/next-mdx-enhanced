@@ -61,25 +61,39 @@ test('layoutPath and defaultLayout options', async () => {
   )
 })
 
+describe('options.extendFrontMatter', () => {
+  it.skip('should work with a sync process fn', async () => {
+    const extendFmFixture = path.join(__dirname, 'fixtures/extendFm')
+    const outPath = await compileNextjs(extendFmFixture)
+    expectContentMatch(outPath, 'index.html', /Hello world/)
+  })
+
+  it.skip('should work with an async process fn', async () => {
+    const extendFmFixture = path.join(__dirname, 'fixtures/extendFm')
+    const outPath = await compileNextjs(extendFmFixture, 'next.config.async.js')
+    expectContentMatch(outPath, 'index.html', /Hello world/)
+  })
+})
+
 // Remove artifacts
 afterAll(() => {
   return Promise.all([
     rmfr(path.join(__dirname, 'fixtures/*/out'), { glob: true }),
     rmfr(path.join(__dirname, 'fixtures/*/.mdx-data'), { glob: true }),
-    rmfr(path.join(__dirname, 'fixtures/*/.next'), { glob: true })
+    rmfr(path.join(__dirname, 'fixtures/*/.next'), { glob: true }),
   ])
 })
 
 // Test Utilities
 
-function compileNextjs(projectPath) {
-  const config = require(path.join(projectPath, 'next.config.js'))
+function compileNextjs(projectPath, configPath = 'next.config.js') {
+  const config = require(path.join(projectPath, configPath))
   const outPath = path.join(projectPath, 'out')
   return nextBuild(projectPath, config)
     .then(() => {
       return nextExport(projectPath, {
         outdir: outPath,
-        silent: true
+        silent: true,
       })
     })
     .then(() => outPath)

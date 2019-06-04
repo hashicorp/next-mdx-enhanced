@@ -3,6 +3,7 @@ const matter = require('gray-matter')
 const glob = require('glob')
 const stringifyObject = require('stringify-object')
 const { getOptions } = require('loader-utils')
+const { extendFrontMatter } = require('./util')
 
 // Loads markdown files with front matter and renders them into a layout.
 // Layout can be set using the `layout` key in the front matter, and will map
@@ -27,14 +28,16 @@ module.exports = async function mdxEnhancedLoader(src) {
 }
 
 function processLayout(options, frontMatter, content, resourcePath) {
-  return new Promise((resolve, reject) => {
+  const { mdxEnhancedPluginOptions: pluginOpts } = options
+
+  return new Promise(async (resolve, reject) => {
     // If no layout is provided and the default layout setting is not on, return the
     // content directly.
-    if (!frontMatter.layout && !options.mdxEnhancedPluginOptions.defaultLayout)
+    if (!frontMatter.layout && !pluginOpts.defaultLayout)
       return resolve(content)
 
     // Set the default if the option is active and there's no layout
-    if (!frontMatter.layout && options.mdxEnhancedPluginOptions.defaultLayout) {
+    if (!frontMatter.layout && pluginOpts.defaultLayout) {
       frontMatter.layout = 'index'
     }
 
@@ -43,7 +46,7 @@ function processLayout(options, frontMatter, content, resourcePath) {
     // resolve the index file within the layouts path.
     const layoutPath = path.resolve(
       options.dir,
-      options.mdxEnhancedPluginOptions.layoutPath,
+      pluginOpts.layoutPath,
       frontMatter.layout
     )
 
@@ -53,6 +56,13 @@ function processLayout(options, frontMatter, content, resourcePath) {
     const layoutMatcher = `${layoutPath}.+(${options.config.pageExtensions.join(
       '|'
     )})`
+
+    const extendedFm = await extendFrontMatter({
+      content,
+      phase: 'loader',
+      extendFm: pluginOpts.extendFrontMatter,
+    })
+
     glob(layoutMatcher, (err, matches) => {
       if (err) return reject(err)
       if (!matches.length) {
@@ -66,9 +76,11 @@ function processLayout(options, frontMatter, content, resourcePath) {
       // Import the layout, export the layout-wrapped content, pass front matter into layout
       return resolve(`import layout from '${layoutPath}'
 
-export default layout(${stringifyObject(
-        Object.assign({}, frontMatter, { __resourcePath: resourcePath })
-      )})
+export default layout(${stringifyObject({
+        ...frontMatter,
+        ...extendedFm,
+        ...{ __resourcePath: resourcePath },
+      })})
 
 ${content}
 `)

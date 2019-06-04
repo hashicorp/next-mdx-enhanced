@@ -4,11 +4,11 @@ const { transform } = require('@babel/core')
 const plugin = require('../babelPlugin')
 
 test('transforms as intended', () => {
-  const mockNextOptions = { dir: __dirname }
+  const mockNextOptions = { dir: 'PATH/TO/NEXT/PROJECT' }
   const { content, filename } = loadFixture('basic')
   const { code } = transform(content, {
     plugins: [plugin(mockNextOptions)],
-    filename
+    filename,
   })
   expect(code).toMatchSnapshot()
 })

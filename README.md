@@ -37,9 +37,50 @@ You need a couple things here in order to get to reasonable functionality.
 
 The default mdx nextjs plugin takes care of point number one, but nothing else. This one knocks out all three. Let's get into how it's done.
 
-### Start with a Layout
+## Options
 
-Let's kick it off with covering the second point: layouts. We can specify a layout for a given `.mdx` file using its front matter, as such:
+```js
+mdxEnhanced({
+  layoutsPath: 'somePath/otherPath',
+  defaultLayout: true,
+  remarkPlugins: [],
+  extendFrontMatter: {
+    process: mdxContent => {},
+    phase: 'prebuild|loader|both',
+  },
+})
+```
+
+### layoutsPath
+
+> `string` | optional | **default: `/layouts`**
+
+Directory used to resolve page layout when `layout` key present in front matter. Value is resolved relative to project root.
+
+### defaultLayout
+
+> `boolean` | optional
+
+Set value to `true` to treat `index.[extension]` within `layoutsPath` as the default layout for any `.mdx` file that a layout has not been specified for.
+
+### remarkPlugins
+
+> `array` | optional
+
+Array of [remark plugins](https://mdxjs.com/advanced/plugins#using-remark-and-rehype-pluginsns) used to transform `.mdx` files
+
+### extendFrontMatter
+
+> `object` | optional
+
+| Property  | Type       | Description                                                                                                                                                           |
+| --------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `process` | `function` | A hook function whose return value will be appended to the processed front matter. This function is given access to the source `.mdx` content as the first parameter. |
+| `phase`   | `string`   | Used to specify when to run the `process` function. Eligible values are `prebuild`, `loader`, `both`. Defaults to `both` if not specified.                            |
+
+## Layouts
+
+We can specify a layout for a given `.mdx` file using its front matter, as such:
 
 ```
 ---
@@ -85,17 +126,7 @@ Now after restarting, the page should render within your layout. Whoo!
 
 There are some additional config options here, let's take a look:
 
-```js
-mdxEnhanced({
-  layoutsPath: 'somePath/otherPath',
-  defaultLayout: true,
-  remarkPlugins: [], // Array of remark plugins -- https://mdxjs.com/advanced/plugins#using-remark-and-rehype-plugins
-})
-```
-
-I mentioned earlier that this plugin looks in `/layouts` -- you are welcome to change this via the option above. Whatever you pass in will be resolved relative to the project root. Additionally, toggling `defaultLayout` to `true` will make the plugin look for an `index.[extension]` layout file within the `layoutsPath` and use this for any `.mdx` file that a layout has not been specified for. This can help to save repetition if most of your pages implement the same layout.
-
-### On to Front Matter
+## Front Matter
 
 So, you now have mdx files rendering as pages within custom layouts, and this is amazing. But how do your users get to these pages? They will have to start with an "index page" of some sort. And often times, it's useful to give users the opportunity to navigate between pages within your layout. Let's set up both of these.
 
