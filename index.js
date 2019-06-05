@@ -3,7 +3,7 @@ const matter = require('gray-matter')
 const path = require('path')
 const { PrebuildWebpackPlugin } = require('@hashicorp/prebuild-webpack-plugin')
 const { createConfigItem } = require('@babel/core')
-const { generateFrontmatterPath } = require('./util')
+const { generateFrontmatterPath, extendFrontMatter } = require('./util')
 const babelPluginFrontmatter = require('./babelPlugin')
 
 module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
@@ -17,6 +17,14 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   // Add mdx as a page extension so that mdx files are compiled as pages
   if (nextConfig.pageExtensions.indexOf('mdx') === -1) {
     nextConfig.pageExtensions.unshift('mdx')
+  }
+
+  // Set default 'phase' for extendFrontMatter option
+  if (
+    pluginOptions.extendFrontMatter &&
+    !pluginOptions.extendFrontMatter.phase
+  ) {
+    pluginOptions.extendFrontMatter.phase = 'both'
   }
 
   return Object.assign({}, nextConfig, {
@@ -54,10 +62,10 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
       config.plugins.push(
         new PrebuildWebpackPlugin({
           build: (_, compilation, files) => {
-            return extractFrontMatter(files, compilation.context)
+            return extractFrontMatter(pluginOptions, files, compilation.context)
           },
           watch: (_, compilation, files) => {
-            return extractFrontMatter(files, compilation.context)
+            return extractFrontMatter(pluginOptions, files, compilation.context)
           },
           files: {
             pattern: '**/*.mdx',
@@ -78,25 +86,28 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
 }
 
 // Given an array of absolute file paths, write out the front matter to a json file
-function extractFrontMatter(files, root) {
-  return Promise.all(files.map(f => fs.readFile(f, 'utf8')))
-    .then(fileContents => {
-      const fmPaths = files.map(f => generateFrontmatterPath(f, root))
-      const frontMatter = fileContents.map((content, idx) => {
-        return {
-          ...matter(content).data,
-          __resourcePath: files[idx].replace(path.join(root, 'pages'), ''),
-        }
-      })
-      return Promise.all(
-        fmPaths.map(fmPath => fs.ensureDir(path.dirname(fmPath)))
-      ).then(() => [frontMatter, fmPaths])
+async function extractFrontMatter(pluginOptions, files, root) {
+  const fileContents = await Promise.all(files.map(f => fs.readFile(f, 'utf8')))
+  const fmPaths = files.map(f => generateFrontmatterPath(f, root))
+  const frontMatter = fileContents.map(async (content, idx) => {
+    const extendedFm = await extendFrontMatter({
+      content,
+      phase: 'prebuild',
+      extendFm: pluginOptions.extendFrontMatter,
     })
-    .then(([contents, fmPaths]) => {
-      return Promise.all(
-        contents.map((content, idx) => {
-          fs.writeFile(fmPaths[idx], JSON.stringify(content))
-        })
-      )
+
+    return {
+      ...matter(content).data,
+      ...extendedFm,
+      __resourcePath: files[idx].replace(path.join(root, 'pages'), ''),
+    }
+  })
+
+  await Promise.all(fmPaths.map(fmPath => fs.ensureDir(path.dirname(fmPath))))
+  const fmContents = await Promise.all(frontMatter)
+  return Promise.all(
+    fmContents.map((content, idx) => {
+      fs.writeFile(fmPaths[idx], JSON.stringify(content))
     })
+  )
 }

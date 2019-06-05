@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`transforms as intended 1`] = `
-"import something from \\"/Users/jeff/Sites/next-plugin-mdx-enhanced/__tests__/.mdx-data/11b4d20c901b6c4a575c374b712856c3.json\\";
+"import something from \\"PATH/TO/NEXT/PROJECT/.mdx-data/f0a7910dd13e8421222e8432cee566f8.json\\";
 import a, { c as d } from './foo.mdx';
-import b from \\"/Users/jeff/Sites/next-plugin-mdx-enhanced/__tests__/.mdx-data/11b4d20c901b6c4a575c374b712856c3.json\\";"
+import b from \\"PATH/TO/NEXT/PROJECT/.mdx-data/f0a7910dd13e8421222e8432cee566f8.json\\";"
 `;
