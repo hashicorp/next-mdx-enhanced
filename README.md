@@ -70,6 +70,12 @@ Set value to `true` to treat `index.[extension]` within `layoutsPath` as the def
 
 Array of [remark plugins](https://mdxjs.com/advanced/plugins#using-remark-and-rehype-pluginsns) used to transform `.mdx` files
 
+### rehypePlugins
+
+> `array` | optional
+
+Array of [rehype plugins](https://mdxjs.com/advanced/plugins#using-remark-and-rehype-pluginsns) used to transform `.mdx` files
+
 ### extendFrontMatter
 
 > `object` | optional
