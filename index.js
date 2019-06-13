@@ -36,7 +36,10 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
           options.defaultLoaders.babel,
           {
             loader: '@mdx-js/loader',
-            options: { remarkPlugins: pluginOptions.remarkPlugins || [] },
+            options: {
+              remarkPlugins: pluginOptions.remarkPlugins || [],
+              rehypePlugins: pluginOptions.rehypePlugins || [],
+            },
           },
           {
             loader: path.join(__dirname, './loader'),

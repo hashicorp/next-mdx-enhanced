@@ -44,6 +44,7 @@ mdxEnhanced({
   layoutsPath: 'somePath/otherPath',
   defaultLayout: true,
   remarkPlugins: [],
+  rehypePlugins: [],
   extendFrontMatter: {
     process: mdxContent => {},
     phase: 'prebuild|loader|both',
