@@ -16,7 +16,7 @@ module.exports.generateFrontmatterPath = function generateFrontmatterPath(
   filePath,
   root
 ) {
-  return path.join(root, `.mdx-data/${md5(filePath)}.json`)
+  return path.join(root, '.mdx-data', `${md5(filePath)}.json`)
 }
 
 // md5 hash a string
