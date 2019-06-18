@@ -42,7 +42,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
             },
           },
           {
-            loader: path.join(__dirname, './loader'),
+            loader: path.join(__dirname, 'loader'),
             options: Object.assign({}, options, {
               mdxEnhancedPluginOptions: pluginOptions,
             }),
