@@ -19,7 +19,6 @@
     "stringify-object": "^3.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
     "next": "^8.1.0",
     "np": "^5.0.2",
     "react": "^16.8.6",
@@ -42,9 +41,6 @@
   ],
   "license": "MPL-2.0",
   "main": "index.js",
-  "peerDependencies": {
-    "@babel/core": "7.x"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hashicorp/next-plugin-mdx-enhanced.git"
