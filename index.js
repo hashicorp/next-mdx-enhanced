@@ -2,7 +2,6 @@ const fs = require('fs-extra')
 const matter = require('gray-matter')
 const path = require('path')
 const { PrebuildWebpackPlugin } = require('@hashicorp/prebuild-webpack-plugin')
-const { createConfigItem } = require('@babel/core')
 const { generateFrontmatterPath, extendFrontMatter } = require('./util')
 const babelPluginFrontmatter = require('./babelPlugin')
 
@@ -54,9 +53,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
       config.module.rules = config.module.rules.map(rule => {
         if (rule.use.loader === 'next-babel-loader') {
           if (!rule.use.options.plugins) rule.use.options.plugins = []
-          rule.use.options.plugins.push(
-            createConfigItem(babelPluginFrontmatter(options))
-          )
+          rule.use.options.plugins.push(babelPluginFrontmatter(options))
         }
         return rule
       })
