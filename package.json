@@ -10,7 +10,7 @@
     "url": "https://github.com/hashicorp/next-plugin-mdx-enhanced/issues"
   },
   "dependencies": {
-    "@hashicorp/prebuild-webpack-plugin": "0.0.2",
+    "@hashicorp/prebuild-webpack-plugin": "0.0.4",
     "@mdx-js/loader": "^1.0.15",
     "fs-extra": "^7.0.1",
     "glob": "^7.1.3",
