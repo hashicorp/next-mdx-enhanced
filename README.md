@@ -1,5 +1,7 @@
 # Next.js + MDX Enhanced
 
+![build status](https://img.shields.io/circleci/build/github/hashicorp/next-mdx-enhanced.svg?style=flat-square)
+
 Have you ever found yourself using [Next.js](https://github.com/zeit/next.js) with [mdx](https://mdxjs.org) but craving the ability to use layouts for full mdx pages, and/or [front matter](https://jekyllrb.com/docs/front-matter/)? Well well my friend, you are in the right place, because that's exactly what this plugin will do for you! 🌟
 
 ## Installation
@@ -47,8 +49,8 @@ mdxEnhanced({
   rehypePlugins: [],
   extendFrontMatter: {
     process: mdxContent => {},
-    phase: 'prebuild|loader|both',
-  },
+    phase: 'prebuild|loader|both'
+  }
 })
 ```
 
