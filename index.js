@@ -1,7 +1,7 @@
 const fs = require('fs-extra')
 const matter = require('gray-matter')
 const path = require('path')
-const PrebuildWebpackPlugin = require('@hashicorp/prebuild-webpack-plugin')
+const PrebuildWebpackPlugin = require('prebuild-webpack-plugin')
 const { generateFrontmatterPath, extendFrontMatter } = require('./util')
 const babelPluginFrontmatter = require('./babelPlugin')
 const debug = require('debug')('next-mdx-enhanced')
