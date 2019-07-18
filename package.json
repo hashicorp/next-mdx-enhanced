@@ -19,6 +19,7 @@
     "stringify-object": "^3.3.0"
   },
   "devDependencies": {
+    "debug": "^4.1.1",
     "next": "^8.1.0",
     "np": "^5.0.2",
     "react": "^16.8.6",

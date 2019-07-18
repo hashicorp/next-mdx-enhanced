@@ -1,5 +1,6 @@
 const path = require('path')
 const { generateFrontmatterPath } = require('./util')
+const debug = require('debug')('next-mdx-enhanced')
 
 // This plugin expects to be called as a function with nextjs' config options, so that it is
 // aware of the project root and can calculate paths relative to it.
@@ -18,6 +19,8 @@ module.exports = function nextBabelWrapper(nextConfig) {
             importsFrontMatter(s)
           )
           if (!frontMatterSpecifier) return
+
+          debug(`start: extracting frontmatter for ${importPath}`)
 
           // front matter is extracted and written out by the loader to .next/frontMatter/<filePathHashed>
           // here, we're calculating the path
@@ -48,6 +51,7 @@ module.exports = function nextBabelWrapper(nextConfig) {
               return acc
             }, [])
           }
+          debug(`finish: extracting frontmatter for ${importPath}`)
         }
       }
     }
