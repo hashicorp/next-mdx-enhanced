@@ -4,7 +4,7 @@ const crypto = require('crypto')
 module.exports.extendFrontMatter = async function extendFrontMatter({
   content,
   phase,
-  extendFm,
+  extendFm
 } = {}) {
   if (!extendFm || !extendFm.process) return {}
   if (extendFm.phase !== 'both' && extendFm.phase !== phase) return {}
@@ -16,7 +16,11 @@ module.exports.generateFrontmatterPath = function generateFrontmatterPath(
   filePath,
   root
 ) {
-  return path.join(root, '.mdx-data', `${md5(filePath)}.json`)
+  return path.join(
+    root,
+    '.mdx-data',
+    `${md5(filePath.replace(__dirname, ''))}.json`
+  )
 }
 
 // md5 hash a string
