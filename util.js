@@ -1,7 +1,7 @@
 const path = require('path')
 const crypto = require('crypto')
 
-module.exports.extendFrontMatter = async function extendFrontMatter({
+async function extendFrontMatter({
   content,
   phase,
   extendFm
@@ -11,17 +11,22 @@ module.exports.extendFrontMatter = async function extendFrontMatter({
 
   return extendFm.process(content)
 }
+module.exports.extendFrontMatter = extendFrontMatter
 
-module.exports.generateFrontmatterPath = function generateFrontmatterPath(
+function generateFrontmatterPath(
   filePath,
   root
 ) {
-  return path.join(
+  const filePathNormalized = normalizeToUnixPath(filePath)
+  const dirnameNormalized = normalizeToUnixPath(__dirname)
+  
+  return normalizeToUnixPath(path.join(
     root,
     '.mdx-data',
-    `${md5(filePath.replace(__dirname, ''))}.json`
-  )
+    `${md5(filePathNormalized.replace(dirnameNormalized, ''))}.json`
+  ))
 }
+module.exports.generateFrontmatterPath = generateFrontmatterPath
 
 // md5 hash a string
 function md5(str) {
@@ -30,3 +35,8 @@ function md5(str) {
     .update(str)
     .digest('hex')
 }
+
+function normalizeToUnixPath(str) {
+  return str.replace(/\\/g, '/')
+}
+module.exports.normalizeToUnixPath = normalizeToUnixPath 

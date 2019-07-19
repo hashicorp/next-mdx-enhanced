@@ -3,7 +3,7 @@ const matter = require('gray-matter')
 const glob = require('glob')
 const stringifyObject = require('stringify-object')
 const { getOptions } = require('loader-utils')
-const { extendFrontMatter } = require('./util')
+const { extendFrontMatter, normalizeToUnixPath  } = require('./util')
 
 // Loads markdown files with front matter and renders them into a layout.
 // Layout can be set using the `layout` key in the front matter, and will map
@@ -16,8 +16,8 @@ module.exports = async function mdxEnhancedLoader(src) {
   const { content, data } = matter(src)
 
   // Get file path relative to project root
-  const resourcePath = this.resourcePath
-    .replace(path.join(this.rootContext, 'pages'), '')
+  const resourcePath = normalizeToUnixPath(this.resourcePath)
+    .replace(normalizeToUnixPath(path.join(normalizeToUnixPath(this.rootContext)), 'pages'), '')
     .substring(1)
 
   // Checks if there's a layout, if there is, resolve the layout and wrap the content in it.
@@ -74,7 +74,7 @@ function processLayout(options, frontMatter, content, resourcePath) {
       }
 
       // Import the layout, export the layout-wrapped content, pass front matter into layout
-      return resolve(`import layout from '${layoutPath}'
+      return resolve(`import layout from '${normalizeToUnixPath(layoutPath)}'
 
 export default layout(${stringifyObject({
         ...frontMatter,
