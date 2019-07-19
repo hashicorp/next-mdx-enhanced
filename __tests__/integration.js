@@ -5,7 +5,7 @@ const nextBuild = require('next/dist/build').default
 const nextExport = require('next/dist/export').default
 
 // increase timeout since these are integration tests
-jest.setTimeout(10000)
+jest.setTimeout(20000)
 
 test('basic integration test', async () => {
   const basicFixture = path.join(__dirname, 'fixtures/basic')
