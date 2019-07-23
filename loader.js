@@ -13,7 +13,14 @@ module.exports = async function mdxEnhancedLoader(src) {
   const options = getOptions(this)
 
   // Parse the front matter
-  const { content, data } = matter(src)
+  let content, data
+  try {
+    const res = matter(src)
+    content = res.content
+    data = res.data
+  } catch (err) {
+    callback(err)
+  }
 
   // Get file path relative to project root
   const resourcePath = normalizeToUnixPath(this.resourcePath)

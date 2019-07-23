@@ -94,29 +94,35 @@ async function extractFrontMatter(pluginOptions, files, root) {
   debug('finish: read all mdx files')
   const fmPaths = files.map(f => generateFrontmatterPath(f, root))
   debug('start: frontmatter extensions')
-  const frontMatter = fileContents.map(async (content, idx) => {
-    const extendedFm = await extendFrontMatter({
-      content,
-      phase: 'prebuild',
-      extendFm: pluginOptions.extendFrontMatter
-    })
+  const frontMatter = await Promise.all(
+    fileContents.map(async (content, idx) => {
+      const extendedFm = await extendFrontMatter({
+        content,
+        phase: 'prebuild',
+        extendFm: pluginOptions.extendFrontMatter
+      })
 
-    return {
-      ...matter(content).data,
-      ...extendedFm,
-      __resourcePath: files[idx].replace(path.join(root, 'pages'), '')
-    }
-  })
+      const { data } = matter(content, {
+        safeLoad: true,
+        filename: files[idx]
+      }).data
+
+      return {
+        ...data,
+        ...extendedFm,
+        __resourcePath: files[idx].replace(path.join(root, 'pages'), '')
+      }
+    })
+  ).catch(console.error)
+  // TODO: remove this catch once this issue has been resolved
+  // https://github.com/zeit/next.js/issues/8068
   debug('finish: frontmatter extensions')
   debug('start: .mdx-data creation')
   await Promise.all(fmPaths.map(fmPath => fs.ensureDir(path.dirname(fmPath))))
   debug('finish: .mdx-data creation')
-  debug('start: await frontmatter completion')
-  const fmContents = await Promise.all(frontMatter)
-  debug('finish: await frontmatter completion')
   debug('start: write data files')
   return Promise.all(
-    fmContents.map((content, idx) => {
+    frontMatter.map((content, idx) => {
       fs.writeFile(fmPaths[idx], JSON.stringify(content))
     })
   ).then(() => {
