@@ -15,7 +15,7 @@ module.exports = async function mdxEnhancedLoader(src) {
   // Parse the front matter
   let content, data
   try {
-    const res = matter(src)
+    const res = matter(src, { safeLoad: true, filename: this.resourcePath })
     content = res.content
     data = res.data
   } catch (err) {
