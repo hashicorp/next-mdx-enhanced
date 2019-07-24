@@ -43,7 +43,7 @@ The default mdx nextjs plugin takes care of point number one, but nothing else. 
 
 ```js
 mdxEnhanced({
-  layoutsPath: 'somePath/otherPath',
+  layoutPath: 'somePath/otherPath',
   defaultLayout: true,
   remarkPlugins: [],
   rehypePlugins: [],
@@ -54,7 +54,7 @@ mdxEnhanced({
 })
 ```
 
-### layoutsPath
+### layoutPath
 
 > `string` | optional | **default: `/layouts`**
 
@@ -64,7 +64,7 @@ Directory used to resolve page layout when `layout` key present in front matter.
 
 > `boolean` | optional
 
-Set value to `true` to treat `index.[extension]` within `layoutsPath` as the default layout for any `.mdx` file that a layout has not been specified for.
+Set value to `true` to treat `index.[extension]` within `layoutPath` as the default layout for any `.mdx` file that a layout has not been specified for.
 
 ### remarkPlugins
 
