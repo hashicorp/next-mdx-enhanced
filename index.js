@@ -105,7 +105,7 @@ async function extractFrontMatter(pluginOptions, files, root) {
       const { data } = matter(content, {
         safeLoad: true,
         filename: files[idx]
-      }).data
+      })
 
       return {
         ...data,
