@@ -110,7 +110,9 @@ async function extractFrontMatter(pluginOptions, files, root) {
       return {
         ...data,
         ...extendedFm,
-        __resourcePath: files[idx].replace(path.join(root, 'pages'), '')
+        __resourcePath: files[idx]
+          .replace(path.join(root, 'pages'), '')
+          .substring(1)
       }
     })
   ).catch(console.error)
