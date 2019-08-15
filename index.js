@@ -8,16 +8,19 @@ const debug = require('debug')('next-mdx-enhanced')
 
 module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   if (!pluginOptions.layoutPath) pluginOptions.layoutPath = 'layouts'
+  if (!pluginOptions.fileExtensions) pluginOptions.fileExtensions = ['mdx']
 
   // Set default pageExtensions if not set already
   if (!nextConfig.pageExtensions) {
     nextConfig.pageExtensions = ['jsx', 'js']
   }
 
-  // Add mdx as a page extension so that mdx files are compiled as pages
-  if (nextConfig.pageExtensions.indexOf('mdx') === -1) {
-    nextConfig.pageExtensions.unshift('mdx')
-  }
+  // Add supported file extensions as page extensions so that mdx files are compiled as pages
+  pluginOptions.fileExtensions.forEach(ext => {
+      if (nextConfig.pageExtensions.indexOf(ext) === -1) {
+        nextConfig.pageExtensions.unshift(ext)
+      }
+  })
 
   // Set default 'phase' for extendFrontMatter option
   if (
@@ -31,7 +34,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
     webpack(config, options) {
       // Add mdx webpack loader stack
       config.module.rules.push({
-        test: /\.mdx?$/,
+        test: new RegExp(`\\.(${ pluginOptions.fileExtensions.join('|') })$`),
         use: [
           options.defaultLoaders.babel,
           {
@@ -70,7 +73,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
             return extractFrontMatter(pluginOptions, files, compilation.context)
           },
           files: {
-            pattern: '**/*.mdx',
+            pattern: `**/*.{${ pluginOptions.fileExtensions.join(',') }}`,
             options: { cwd: config.context },
             addFilesAsDependencies: true
           }
