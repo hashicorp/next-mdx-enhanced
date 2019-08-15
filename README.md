@@ -45,6 +45,7 @@ The default mdx nextjs plugin takes care of point number one, but nothing else. 
 mdxEnhanced({
   layoutPath: 'somePath/otherPath',
   defaultLayout: true,
+  fileExtensions: ['mdx'],
   remarkPlugins: [],
   rehypePlugins: [],
   extendFrontMatter: {
@@ -65,6 +66,12 @@ Directory used to resolve page layout when `layout` key present in front matter.
 > `boolean` | optional
 
 Set value to `true` to treat `index.[extension]` within `layoutPath` as the default layout for any `.mdx` file that a layout has not been specified for.
+
+### fileExtensions
+
+> `array` | optional | **default: `['mdx']`**
+
+Array of file extensions that should be processed as MDX pages.
 
 ### remarkPlugins
 
