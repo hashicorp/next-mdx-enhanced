@@ -11,7 +11,9 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
 
   // Set default pageExtensions if not set already
   if (!nextConfig.pageExtensions) {
-    nextConfig.pageExtensions = ['jsx', 'js']
+    // This extension list should be kept in sync with the NextJS default:
+    // https://github.com/zeit/next.js/blob/d9abbaded1a443056a5cee68d6bbda6f42057dae/packages/next-server/server/config.ts#L19
+    nextConfig.pageExtensions = ['tsx', 'ts', 'jsx', 'js']
   }
 
   // Add mdx as a page extension so that mdx files are compiled as pages
