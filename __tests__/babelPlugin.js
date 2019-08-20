@@ -5,10 +5,11 @@ const plugin = require('../babelPlugin')
 
 test('transforms as intended', () => {
   const mockNextOptions = { dir: 'PATH/TO/NEXT/PROJECT' }
+  const mockPluginOptions = { fileExtensions: ['mdx'] }
   const { content, filename } = loadFixture('basic')
   const { code } = transform(content, {
-    plugins: [plugin(mockNextOptions)],
-    filename,
+    plugins: [plugin(mockNextOptions, mockPluginOptions)],
+    filename
   })
   expect(code).toMatchSnapshot()
 })
