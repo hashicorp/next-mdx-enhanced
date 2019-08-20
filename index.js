@@ -12,16 +12,14 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
 
   // Set default pageExtensions if not set already
   if (!nextConfig.pageExtensions) {
-    // This extension list should be kept in sync with the NextJS default:
-    // https://github.com/zeit/next.js/blob/d9abbaded1a443056a5cee68d6bbda6f42057dae/packages/next-server/server/config.ts#L19
-    nextConfig.pageExtensions = ['tsx', 'ts', 'jsx', 'js']
+    nextConfig.pageExtensions = ['jsx', 'js']
   }
 
   // Add supported file extensions as page extensions so that mdx files are compiled as pages
   pluginOptions.fileExtensions.forEach(ext => {
-      if (nextConfig.pageExtensions.indexOf(ext) === -1) {
-        nextConfig.pageExtensions.unshift(ext)
-      }
+    if (nextConfig.pageExtensions.indexOf(ext) === -1) {
+      nextConfig.pageExtensions.unshift(ext)
+    }
   })
 
   // Set default 'phase' for extendFrontMatter option
@@ -36,7 +34,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
     webpack(config, options) {
       // Add mdx webpack loader stack
       config.module.rules.push({
-        test: new RegExp(`\\.(${ pluginOptions.fileExtensions.join('|') })$`),
+        test: new RegExp(`\\.(${pluginOptions.fileExtensions.join('|')})$`),
         use: [
           options.defaultLoaders.babel,
           {
@@ -59,7 +57,9 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
       config.module.rules = config.module.rules.map(rule => {
         if (rule.use.loader === 'next-babel-loader') {
           if (!rule.use.options.plugins) rule.use.options.plugins = []
-          rule.use.options.plugins.push(babelPluginFrontmatter(options))
+          rule.use.options.plugins.push(
+            babelPluginFrontmatter(options, pluginOptions)
+          )
         }
         return rule
       })
@@ -75,7 +75,10 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
             return extractFrontMatter(pluginOptions, files, compilation.context)
           },
           files: {
-            pattern: `**/*.{${ pluginOptions.fileExtensions.join(',') }}`,
+            pattern:
+              pluginOptions.fileExtensions.length > 1
+                ? `**/*.{${pluginOptions.fileExtensions.join(',')}}`
+                : `**/*.${pluginOptions.fileExtensions[0]}`,
             options: { cwd: config.context },
             addFilesAsDependencies: true
           }

@@ -22,7 +22,7 @@ test('basic integration test', async () => {
   )
 })
 
-test('layoutPath and defaultLayout options', async () => {
+test('options.layoutPath and options.defaultLayout', async () => {
   const layoutsPathFixture = path.join(__dirname, 'fixtures/layouts-path')
   const outPath = await compileNextjs(layoutsPathFixture)
   expectContentMatch(outPath, 'index.html', /Hello world/)
@@ -49,6 +49,13 @@ describe('options.extendFrontMatter', () => {
     const outPath = await compileNextjs(extendFmFixture, 'next.config.async.js')
     expectContentMatch(outPath, 'index.html', /Hello world/)
   })
+})
+
+test('options.fileExtensions', async () => {
+  const fileExtensionsFixture = path.join(__dirname, 'fixtures/file-extensions')
+  const outPath = await compileNextjs(fileExtensionsFixture)
+  expectContentMatch(outPath, 'index.html', /<p>md: <span>\.md<\/span><\/p>/)
+  expectContentMatch(outPath, 'index.html', /<p>mdx: <span>\.mdx<\/span><\/p>/)
 })
 
 // Remove artifacts

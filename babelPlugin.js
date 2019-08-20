@@ -4,7 +4,7 @@ const debug = require('debug')('next-mdx-enhanced')
 
 // This plugin expects to be called as a function with nextjs' config options, so that it is
 // aware of the project root and can calculate paths relative to it.
-module.exports = function nextBabelWrapper(nextConfig) {
+module.exports = function nextBabelWrapper(nextConfig, pluginOptions) {
   // The function it returns is the actual babel plugin
   return function frontMatterExtractionPlugin({ types: t }) {
     return {
@@ -12,7 +12,12 @@ module.exports = function nextBabelWrapper(nextConfig) {
         ImportDeclaration(_path, state) {
           // if we're not looking at a .mdx file import, do nothing
           const importPath = _path.node.source.value
-          if (!importPath.match(/\.mdx$/)) return
+          if (
+            !importPath.match(
+              new RegExp(`\\.(${pluginOptions.fileExtensions.join('|')})$`)
+            )
+          )
+            return
 
           // if there are no "frontMatter" imports, do nothing
           const frontMatterSpecifier = _path.node.specifiers.find(s =>
