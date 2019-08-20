@@ -38,13 +38,13 @@ test('options.layoutPath and options.defaultLayout', async () => {
 })
 
 describe('options.extendFrontMatter', () => {
-  it.skip('should work with a sync process fn', async () => {
+  it('should work with a sync process fn', async () => {
     const extendFmFixture = path.join(__dirname, 'fixtures/extend-frontmatter')
     const outPath = await compileNextjs(extendFmFixture)
     expectContentMatch(outPath, 'index.html', /Hello world/)
   })
 
-  it.skip('should work with an async process fn', async () => {
+  it('should work with an async process fn', async () => {
     const extendFmFixture = path.join(__dirname, 'fixtures/extend-frontmatter')
     const outPath = await compileNextjs(extendFmFixture, 'next.config.async.js')
     expectContentMatch(outPath, 'index.html', /Hello world/)
