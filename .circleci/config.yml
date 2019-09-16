@@ -24,16 +24,16 @@ jobs:
     steps:
       - checkout
       - run:
-        name: 'Install Package Manager'
-        command: iwr -useb get.scoop.sh | iex
+          name: "Install Package Manager"
+          command: iwr -useb get.scoop.sh | iex
       - run:
-        name: 'Install Node'
-        command: scoop install nodejs
+          name: "Install Node"
+          command: scoop install nodejs
       - run: npm install
       - run: npm test
 workflows:
   version: 2
   build:
-  jobs:
-    - linux
-    - windows
+    jobs:
+      - linux
+      - windows
