@@ -25,7 +25,7 @@ jobs:
       - checkout
       - run:
           name: "Install Package Manager"
-          command: iwr -useb get.scoop.sh | iex
+          command: Set-ExecutionPolicy RemoteSigned -scope CurrentUser && iwr -useb get.scoop.sh | iex
       - run:
           name: "Install Node"
           command: scoop install nodejs
