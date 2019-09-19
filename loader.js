@@ -21,7 +21,8 @@ module.exports = async function mdxEnhancedLoader(src) {
   } catch (err) {
     callback(err)
   }
-
+  // Scan for plugin `scan` option to return results based on RegEx patterns provided in config
+  const scans = scanContent(options, content)
   // Get file path relative to project root
   const resourcePath = normalizeToUnixPath(this.resourcePath)
     .replace(
@@ -34,12 +35,29 @@ module.exports = async function mdxEnhancedLoader(src) {
 
   // Checks if there's a layout, if there is, resolve the layout and wrap the content in it.
   processLayout
-    .call(this, options, data, content, resourcePath)
+    .call(this, options, data, content, resourcePath, scans)
     .then(result => callback(null, result))
     .catch(err => callback(err))
 }
-
-function processLayout(options, frontMatter, content, resourcePath) {
+function scanContent(options, content) {
+  const { mdxEnhancedPluginOptions: pluginOpts } = options
+  if (!pluginOpts.scan) return {}
+  return Object.keys(pluginOpts.scan).reduce((acc, opt) => {
+    // Put the result of the pattern match onto the `scans` object: `{ key : result }`
+    if (content.match(pluginOpts.scan[opt].pattern)) {
+      acc[opt] =
+        // Check to see if a `transform` function & it is a function
+        pluginOpts.scan[opt].transform &&
+        typeof pluginOpts.scan[opt].transform === 'function'
+          ? pluginOpts.scan[opt].transform(
+              content.match(pluginOpts.scan[opt].pattern)
+            )
+          : content.match(opt.pattern) // Otherwise pass the raw Array of matches as the result for this key. More info here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match#Return_value
+    }
+    return acc
+  }, {})
+}
+function processLayout(options, frontMatter, content, resourcePath, scans) {
   const { mdxEnhancedPluginOptions: pluginOpts } = options
 
   return new Promise(async (resolve, reject) => {
@@ -79,9 +97,7 @@ function processLayout(options, frontMatter, content, resourcePath) {
       if (err) return reject(err)
       if (!matches.length) {
         throw new Error(
-          `File "${resourcePath}" specified "${
-            frontMatter.layout
-          }" as its layout, but no matching file was found at "${layoutMatcher}"`
+          `File "${resourcePath}" specified "${frontMatter.layout}" as its layout, but no matching file was found at "${layoutMatcher}"`
         )
       }
 
@@ -91,7 +107,8 @@ function processLayout(options, frontMatter, content, resourcePath) {
 export default layout(${stringifyObject({
         ...frontMatter,
         ...extendedFm,
-        ...{ __resourcePath: resourcePath }
+        ...{ __resourcePath: resourcePath },
+        ...{ __scans: scans }
       })})
 
 ${content}

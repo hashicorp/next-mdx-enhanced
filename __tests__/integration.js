@@ -58,6 +58,18 @@ test('options.fileExtensions', async () => {
   expectContentMatch(outPath, 'index.html', /<p>mdx: <span>\.mdx<\/span><\/p>/)
 })
 
+test('options.scan', async () => {
+  const scansFixture = path.join(__dirname, 'fixtures/scan-mdx-content')
+  const outPath = await compileNextjs(scansFixture)
+  expectContentMatch(outPath, 'docs/intro.html', /css\?family=Press\+Start\+2P/)
+  expectContentMatch(outPath, 'docs/intro.html', /<h1>We found snargles<\/h1>/)
+  expectContentMatch(
+    outPath,
+    'docs/advanced.html',
+    /<h1>Nigel Thornberry<\/h1>/
+  )
+})
+
 // Remove artifacts
 afterAll(() => {
   return Promise.all([
