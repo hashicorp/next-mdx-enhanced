@@ -23,14 +23,15 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: Set-ExecutionPolicy RemoteSigned -scope CurrentUser
-      - run:
-          name: "Install Package Manager"
-          command: iwr -useb get.scoop.sh | iex
-      - run:
-          name: "Install Node"
-          command: scoop install nodejs
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
       - run: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
       - run: npm test
 workflows:
   version: 2
