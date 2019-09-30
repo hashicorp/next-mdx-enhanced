@@ -94,6 +94,19 @@ Array of [rehype plugins](https://mdxjs.com/advanced/plugins#using-remark-and-re
 | `process` | `function` | A hook function whose return value will be appended to the processed front matter. This function is given access to the source `.mdx` content as the first parameter. |
 | `phase`   | `string`   | Used to specify when to run the `process` function. Eligible values are `prebuild`, `loader`, `both`. Defaults to `both` if not specified.                            |
 
+### scan
+
+> `object` | optional
+
+Object of scan objects containing the following parameters
+
+| Property    | Type                                       | Description                                                                                                                                                                                                                                                                                                                                          |
+| ----------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pattern`   | `RegEx`                                    | A RegEx to use for scanning `.mdx` content, enables Layout customization                                                                                                                                                                                                                                                                             |
+| `transform` | `function(match: Array[]): any` _optional_ | An optional callback function that transforms the result of the match operation. This function is passed an Array of any matching `.mdx` content that is returned by [`content.match(pattern)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match#Return_value) operation utilizing the `pattern` RegEx. |
+
+See ["Scanning MDX Content"](#scanning-mdx-content) for more details.
+
 ## Layouts
 
 We can specify a layout for a given `.mdx` file using its front matter, as such:
@@ -226,3 +239,64 @@ The only thing that should seem unfamiliar here is `__resourcePath` -- this is a
 And you can do the same thing in your layout file in order to allow easy links to other docs pages if needed.
 
 > _Nerd Note:_ If you're a real sharp thinker, you may have noticed that it is seemingly impossible for this previous statement to be true, since importing a mdx file requires rendering into its layout, but its layout also requires all the other mdx files, which each require rendering into their layouts, etc. This is what some may call an infinite loop, and it is impossible. In reality, this plugin does a little dirty work under the hood to make this behavior possible. It also injects a babel plugin which extracts the front matter out to separate temporary files, then transforms any front matter imports into importing from the separate file, which breaks the loop.
+
+## Scanning MDX Content
+
+Sample `next.config.js` entry:
+
+```js
+// in next.config.js
+withMdxEnhanced({
+  scan: [
+    {
+      someImportantKey: {
+        pattern: /<SomeComponent.*name=['"](.*)['"].*\/>/,
+        transform: arr => arr[1] // Optionally get a specific value back via a function;
+        // if `transform` is omitted, any and all matches will be returned in an array
+    }
+  ]
+})
+```
+
+If an MDX page uses `<SomeComponent />`
+
+```js
+---
+layout: 'docs-page'
+title: 'Advanced Docs'
+---
+
+import SomeComponent from '../../components/SomeComponent'
+
+This is some _really_ **advanced** docs content!
+
+<SomeComponent name="Find this text" />
+
+```
+
+This will produce an `Array` of matches returned to your `Layout` by the plugin.
+
+```js
+__scans: {
+  someImportantKey: ['Find this text']
+}
+```
+
+Consume these values in the `Layout` with the `__scans` key that is passed in along with anything else the plugin has provided.
+
+```jsx
+export default plugIn => {
+  const __scans = plugIn.__scans
+  return function Layout({ children }) {
+    return (
+   <>
+    {/*..begin Layout..*/}
+        {__scans.someImportantKey && (
+          <h1>{__scans.someImportantKey}</h1> // returns <h1>Find this text</h1>
+        )}
+    {/*..end Layout..*/}
+  </>
+
+```
+
+For more reference and an example use case please see the [`/scan-mdx-content/`](https://github.com/hashicorp/next-mdx-enhanced/tree/master/__tests__/fixtures/scan-mdx-content) test.
