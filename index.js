@@ -10,9 +10,10 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   if (!pluginOptions.layoutPath) pluginOptions.layoutPath = 'layouts'
   if (!pluginOptions.fileExtensions) pluginOptions.fileExtensions = ['mdx']
 
-  // Set default pageExtensions if not set already
+  // This extension list should be kept in sync with the NextJS default:
+  // https://github.com/zeit/next.js/blob/d9abbaded1a443056a5cee68d6bbda6f42057dae/packages/next-server/server/config.ts#L19
   if (!nextConfig.pageExtensions) {
-    nextConfig.pageExtensions = ['jsx', 'js']
+    nextConfig.pageExtensions = ['jsx', 'js', 'tsx', 'ts']
   }
 
   // Add supported file extensions as page extensions so that mdx files are compiled as pages
