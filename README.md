@@ -107,6 +107,12 @@ Object of scan objects containing the following parameters
 
 See ["Scanning MDX Content"](#scanning-mdx-content) for more details.
 
+### onContent
+
+> `function` | optional
+
+A function that will run on build for each MDX page. All metadata and full text content are passed to this function as its only argument. Useful for indexing your content for site search or any other purpose where you'd like to capture content on build.
+
 ## Layouts
 
 We can specify a layout for a given `.mdx` file using its front matter, as such:
