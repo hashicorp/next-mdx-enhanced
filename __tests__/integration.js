@@ -3,6 +3,7 @@ const fs = require('fs')
 const rmfr = require('rmfr')
 const nextBuild = require('next/dist/build').default
 const nextExport = require('next/dist/export').default
+const glob = require('glob')
 
 // increase timeout since these are integration tests
 jest.setTimeout(20000)
@@ -70,6 +71,22 @@ test('options.scan', async () => {
   )
 })
 
+test('options.onContent', async () => {
+  const onContentFixture = path.join(__dirname, 'fixtures/on-content')
+  let mdxPageCount = 0
+  glob('**/**/*.mdx', { cwd: onContentFixture }, (err, files) => {
+    if (err) throw err
+    mdxPageCount = files.length
+  })
+  const mockCallback = jest.fn(content => console.log(content))
+  const compile = await compileNextjsWithMockFunction(
+    onContentFixture,
+    'next.config-mock.js',
+    mockCallback
+  )
+  expect(compile.mock.calls.length).toBe(mdxPageCount)
+})
+
 // Remove artifacts
 afterAll(() => {
   return Promise.all([
@@ -97,4 +114,19 @@ function compileNextjs(projectPath, configPath = 'next.config.js') {
 function expectContentMatch(outPath, filePath, matcher) {
   const content = fs.readFileSync(path.join(outPath, filePath), 'utf8')
   return expect(content).toMatch(matcher)
+}
+
+function compileNextjsWithMockFunction(
+  projectPath,
+  configPath = 'next.config.js',
+  mockFn
+) {
+  const config = require(path.join(projectPath, configPath))
+  const outPath = path.join(projectPath, 'out')
+  return nextBuild(projectPath, config(mockFn)).then(() => {
+    return nextExport(projectPath, {
+      outdir: outPath,
+      silent: true
+    }).then(() => mockFn)
+  })
 }

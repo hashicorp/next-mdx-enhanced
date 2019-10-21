@@ -101,9 +101,19 @@ function processLayout(options, frontMatter, content, resourcePath, scans) {
         )
       }
 
+      const { onContent } = pluginOpts
+      if (onContent && this._compiler.name === 'server') {
+        onContent({
+          ...frontMatter,
+          ...extendedFm,
+          ...{ __resourcePath: resourcePath },
+          content
+        })
+      }
+
       // Import the layout, export the layout-wrapped content, pass front matter into layout
       return resolve(`import layout from '${normalizeToUnixPath(layoutPath)}'
-
+      
 export default layout(${stringifyObject({
         ...frontMatter,
         ...extendedFm,
