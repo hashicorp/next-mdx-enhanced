@@ -56,7 +56,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
 
       // Add babel plugin to rewrite front matter imports
       config.module.rules = config.module.rules.map(rule => {
-        if (rule.use.loader === 'next-babel-loader') {
+        if (rule.use && rule.use.loader === 'next-babel-loader') {
           if (!rule.use.options.plugins) rule.use.options.plugins = []
           rule.use.options.plugins.push(
             babelPluginFrontmatter(options, pluginOptions)
