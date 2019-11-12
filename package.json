@@ -1,7 +1,7 @@
 {
   "name": "next-mdx-enhanced",
   "description": "Next.js plugin for rendering MDX with layouts and front matter",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "contributors": [
     "Jeff Escalante",
     "Kevin Pruett"
