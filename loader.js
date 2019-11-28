@@ -112,7 +112,7 @@ function processLayout(options, frontMatter, content, resourcePath, scans) {
       }
 
       // Import the layout, export the layout-wrapped content, pass front matter into layout
-      return resolve(`import layout from '${normalizeToUnixPath(layoutPath)}'
+      return resolve(`import layout from '${normalizeToUnixPath(matches[0])}'
       
 export default layout(${stringifyObject({
         ...frontMatter,
