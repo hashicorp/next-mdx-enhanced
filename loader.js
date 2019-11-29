@@ -57,72 +57,70 @@ function scanContent(options, content) {
     return acc
   }, {})
 }
-function processLayout(options, frontMatter, content, resourcePath, scans) {
+async function processLayout(options, frontMatter, content, resourcePath, scans) {
   const { mdxEnhancedPluginOptions: pluginOpts } = options
 
-  return new Promise(async (resolve, reject) => {
-    // If no layout is provided and the default layout setting is not on, return the
-    // content directly.
-    if (!frontMatter.layout && !pluginOpts.defaultLayout)
-      return resolve(content)
+  // If no layout is provided and the default layout setting is not on, return the
+  // content directly.
+  if (!frontMatter.layout && !pluginOpts.defaultLayout)
+    return content
 
-    // Set the default if the option is active and there's no layout
-    if (!frontMatter.layout && pluginOpts.defaultLayout) {
-      frontMatter.layout = 'index'
+  // Set the default if the option is active and there's no layout
+  if (!frontMatter.layout && pluginOpts.defaultLayout) {
+    frontMatter.layout = 'index'
+  }
+
+  // Layouts default to resolving from "<root>/layouts", but this is configurable.
+  // If the frontMatter doesn't have a layout and defaultLayout is true, try to
+  // resolve the index file within the layouts path.
+  const layoutPath = path.resolve(
+    options.dir,
+    pluginOpts.layoutPath,
+    frontMatter.layout
+  )
+
+  // If the layout doesn't exist, throw a descriptive error
+  // We use glob to check for existence, since the file could have multiple page
+  // extensions depending on the config
+  const layoutMatcher = `${layoutPath}.+(${options.config.pageExtensions.join(
+    '|'
+  )})`
+
+  const extendedFm = await extendFrontMatter({
+    content,
+    phase: 'loader',
+    extendFm: pluginOpts.extendFrontMatter
+  })
+
+  glob(layoutMatcher, (err, matches) => {
+    if (err) throw err
+    if (!matches.length) {
+      throw new Error(
+        `File "${resourcePath}" specified "${frontMatter.layout}" as its layout, but no matching file was found at "${layoutMatcher}"`
+      )
     }
 
-    // Layouts default to resolving from "<root>/layouts", but this is configurable.
-    // If the frontMatter doesn't have a layout and defaultLayout is true, try to
-    // resolve the index file within the layouts path.
-    const layoutPath = path.resolve(
-      options.dir,
-      pluginOpts.layoutPath,
-      frontMatter.layout
-    )
-
-    // If the layout doesn't exist, throw a descriptive error
-    // We use glob to check for existence, since the file could have multiple page
-    // extensions depending on the config
-    const layoutMatcher = `${layoutPath}.+(${options.config.pageExtensions.join(
-      '|'
-    )})`
-
-    const extendedFm = await extendFrontMatter({
-      content,
-      phase: 'loader',
-      extendFm: pluginOpts.extendFrontMatter
-    })
-
-    glob(layoutMatcher, (err, matches) => {
-      if (err) return reject(err)
-      if (!matches.length) {
-        throw new Error(
-          `File "${resourcePath}" specified "${frontMatter.layout}" as its layout, but no matching file was found at "${layoutMatcher}"`
-        )
-      }
-
-      const { onContent } = pluginOpts
-      if (onContent && this._compiler.name === 'server') {
-        onContent({
-          ...frontMatter,
-          ...extendedFm,
-          ...{ __resourcePath: resourcePath },
-          content
-        })
-      }
-
-      // Import the layout, export the layout-wrapped content, pass front matter into layout
-      return resolve(`import layout from '${normalizeToUnixPath(layoutPath)}'
-      
-export default layout(${stringifyObject({
+    const { onContent } = pluginOpts
+    if (onContent && this._compiler.name === 'server') {
+      onContent({
         ...frontMatter,
         ...extendedFm,
         ...{ __resourcePath: resourcePath },
-        ...{ __scans: scans }
-      })})
+        content
+      })
+    }
+
+    // Import the layout, export the layout-wrapped content, pass front matter into layout
+    return `import layout from '${normalizeToUnixPath(layoutPath)}'
+    
+export default layout(${stringifyObject({
+      ...frontMatter,
+      ...extendedFm,
+      ...{ __resourcePath: resourcePath },
+      ...{ __scans: scans }
+    })})
 
 ${content}
-`)
-    })
+`
   })
 }
