@@ -216,7 +216,7 @@ import {frontMatter} from './docs/*.mdx'
 
 export default () => {
   return (<>
-    <h1>Docs Index<h1>
+    <h1>Docs Index</h1>
     <ul>
       {frontMatter.map(page => {
         <li><Link href={formatPath(page.__resourcePath)}><a>{page.title}</a></Link></li>
