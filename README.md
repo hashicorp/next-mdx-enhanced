@@ -224,13 +224,13 @@ export default () => {
   return (<>
     <h1>Docs Index<h1>
     <ul>
-      {docsPages.map(page => {
+      {docsPages.map(page => (
         <li key={page.__resourcePath}>
           <Link href={formatPath(page.__resourcePath)}>
             <a>{page.title}</a>
           </Link>
         </li>
-      })}
+      ))}
     </ul>
   </>)
 }
