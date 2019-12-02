@@ -2,48 +2,63 @@
 
 [![build status](https://img.shields.io/circleci/build/github/hashicorp/next-mdx-enhanced.svg?style=flat-square)](https://circleci.com/gh/hashicorp/next-mdx-enhanced)
 
-Have you ever found yourself using [Next.js](https://github.com/zeit/next.js) with [mdx](https://mdxjs.com) but craving the ability to use layouts for full mdx pages, and/or [front matter](https://jekyllrb.com/docs/front-matter/)? Well well my friend, you are in the right place, because that's exactly what this plugin will do for you! 🌟
+Are you using [Next.js](https://github.com/zeit/next.js) with
+[MDX](https://mdxjs.com) and wanted layouts and [front
+matter](https://jekyllrb.com/docs/front-matter/)?
 
-## Installation
-
-Start with `npm i next-mdx-enhanced`. You can then instantiate it as a Next.js plugin as such:
-
-```js
-// next.config.js
-const withMdxEnhanced = require('next-mdx-enhanced')
-
-module.exports = withMdxEnhanced(/* options, see below */)(/* your normal nextjs config */)
-```
-
-Also, make sure to add `.mdx-data` to your `.gitignore` file, this is a directory generated as part of the optimization process for this plugin.
-
-## Usage
-
-Let's get right into an example. Say you have set up the plugin as above, and you have site for displaying some docs (or blog, etc) that you're working on that looks like this:
+Well well my friend, you are in the right place, because that's exactly what
+this plugin will do for you! 🌟 If have a site that displays content (e.g.
+documentation) that looks like:
 
 ```
-MyApp
+MyDocsApp
 ├─ pages
 │  ├ index.jsx
 │  └ docs
 │    ├ intro.mdx
 │    └ advanced.mdx
+├─ layouts
+│  └ docs-page.jsx
 └ next.config.js
 ```
 
-You need a couple things here in order to get to reasonable functionality.
+And you want the following:
 
-1. The `.mdx` must each render as a page
-2. The `.mdx` pages must render within your site's common layout
-3. You need to be able to create an index of each of the pages for easy navigation
+| feature                            | next-mdx-enhanced | @next/mdx |
+| ---------------------------------- | ------------------- | ------- |
+| MDX files render as a navigable page                     | ✅ | ✅ |
+| MDX files render with a common layout                    | ✅ | ❌ |
+| An index page that contains a navigable link to each MDX | ✅ | ❌ |
 
-The default mdx nextjs plugin takes care of point number one, but nothing else. This one knocks out all three. Let's get into how it's done.
+## Installation
 
-## Options
+Install the package:
+
+```shell
+$ npm install next-mdx-enhanced
+```
+
+Open the `.gitgnore` file and add the `.mdx-data` diretory:
+
+```shell
+# .gitignore
+
+# Ignore next-mdx-enhanced cache directory
+.mdx-data
+```
+
+This directory is populated with cache files as an optimization.
+
+## Usage & Options
+
+Open the `next.config.js` file and instantiate it as a Next.js plugin:
 
 ```js
-mdxEnhanced({
-  layoutPath: 'somePath/otherPath',
+// next.config.js
+const withMdxEnhanced = require('next-mdx-enhanced')
+
+module.exports = withMdxEnhanced({
+  layoutPath: 'layouts',
   defaultLayout: true,
   fileExtensions: ['mdx'],
   remarkPlugins: [],
@@ -52,20 +67,22 @@ mdxEnhanced({
     process: mdxContent => {},
     phase: 'prebuild|loader|both'
   }
-})
+})(/* your normal nextjs config */)
 ```
 
 ### layoutPath
 
-> `string` | optional | **default: `/layouts`**
+> `string` | optional | **default: `layouts`**
 
-Directory used to resolve page layout when `layout` key present in front matter. Value is resolved relative to project root.
+The directory used to resolve the page layout when `layout` key present in MDX
+front matter. Value is resolved relative to project root.
 
 ### defaultLayout
 
 > `boolean` | optional
 
-Set value to `true` to treat `index.[extension]` within `layoutPath` as the default layout for any `.mdx` file that a layout has not been specified for.
+Set value to `true` to treat `index.[extension]` within `layoutPath` as the
+default layout for any `.mdx` file that a layout has not been specified for.
 
 ### fileExtensions
 
@@ -77,13 +94,17 @@ Array of file extensions that should be processed as MDX pages.
 
 > `array` | optional
 
-Array of [remark plugins](https://mdxjs.com/advanced/plugins#using-remark-and-rehype-pluginsns) used to transform `.mdx` files
+Array of [remark
+plugins](https://mdxjs.com/advanced/plugins#using-remark-and-rehype-plugins)
+used to transform `.mdx` files
 
 ### rehypePlugins
 
 > `array` | optional
 
-Array of [rehype plugins](https://mdxjs.com/advanced/plugins#using-remark-and-rehype-pluginsns) used to transform `.mdx` files
+Array of [rehype
+plugins](https://mdxjs.com/advanced/plugins#using-remark-and-rehype-plugins)
+used to transform `.mdx` files
 
 ### extendFrontMatter
 
@@ -109,66 +130,77 @@ See ["Scanning MDX Content"](#scanning-mdx-content) for more details.
 
 ### onContent
 
-> `function` | optional
+> `function(mdxContent)` | optional
 
-A function that will run on build for each MDX page. All metadata and full text content are passed to this function as its only argument. Useful for indexing your content for site search or any other purpose where you'd like to capture content on build.
+This function runs on each build of an MDX page. All metadata and full text
+content are passed to this function as its only argument.
+
+> Useful for indexing your content for site search or any other purpose where
+> you'd like to capture content on build.
 
 ## Layouts
 
-We can specify a layout for a given `.mdx` file using its front matter, as such:
+Each MDX file may define the name of layout within its front matter.
+
+Given an MDX page named `pages/docs/intro.mdx`:
 
 ```
 ---
 layout: 'docs-page'
-title: 'Intro Page'
+title: 'Introduction'
 ---
 
 Here's some *markdown* content!
 ```
 
-When the plugin sees the `layout` key, it will go looking by default in `/layouts/{name}` -- so in this case, it will look for `/layouts/docs-page` -- the extension can be any of the [pageExtensions](https://nextjs.org/docs#configuring-extensions-looked-for-when-resolving-pages-in-pages) you have configured. In this case, let's just use `.jsx`. Running this code will give you an error that the layout file was not found, so let's create it:
+This loads the content within the layout defined at:
 
-```diff
-MyApp
-├─ pages
-│  ├ index.jsx
-│  └ docs
-│    ├ intro.mdx
-│    └ advanced.mdx
-+├─ layouts
-+│  └ docs-page.jsx
-└ next.config.js
+```
+MyDocsApp
+...
+└─ layouts
+   └ docs-page.jsx # SEE supported extensions below
+...
 ```
 
-And for the content of your layout, nice and easy:
+The plugin's `layoutPath` option defaults to `layouts`.
+
+The file extension of the template must be one of configured
+[pageExtensions](https://nextjs.org/docs#configuring-extensions-looked-for-when-resolving-pages-in-pages).
+
+The template, defined in `layoutes/docs-page.jsx`, looks like the following:
 
 ```jsx
 export default frontMatter => {
-  return ({ children }) => {
+  return ({ children: content }) => {
     return (
       <div>
         <h1>{frontMatter.title}</h1>
-        {children}
+        {content}
       </div>
     )
   }
 }
 ```
 
-In this case, all front matter is passed in to the default export function as a javascript object, so here we use the page title to display at the top in an `h1`. The contents of the markdown file are passed in as `children` from the returned function, so wherever we drop `{children}` the markdown file contents will render.
-
-Now after restarting, the page should render within your layout. Whoo!
-
-There are some additional config options here, let's take a look:
+The default export function receives the front matter object, `frontMatter`, as
+a parameter. This function returns a rendering function. The rendering function
+receives an object that contains the the page content as `children` that is
+[destructured and
+reassigned](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)
+to `content`.
 
 ## Front Matter
 
-So, you now have mdx files rendering as pages within custom layouts, and this is amazing. But how do your users get to these pages? They will have to start with an "index page" of some sort. And often times, it's useful to give users the opportunity to navigate between pages within your layout. Let's set up both of these.
+The front matter can be imported into your index pages and your templates. This
+enables you to create index pages or provide navigation across all your pages.
 
-Remember this file tree?
+### Create an index page
+
+Given an index page named `pages/index.jsx`:
 
 ```
-MyApp
+MyDocsApp
 ├─ pages
 │  ├ index.jsx
 │  └ docs
@@ -179,7 +211,7 @@ MyApp
 └ next.config.js
 ```
 
-Let's head over to the `index.jsx` page and make that our entry point.
+With the content:
 
 ```jsx
 import Link from 'next/link'
@@ -187,11 +219,18 @@ import {frontMatter as introData} from './docs/intro.mdx'
 import {frontMatter as advancedData} from './docs/advanced.mdx'
 
 export default () => {
+  const docsPages = [ introData, advancedData ]
+
   return (<>
     <h1>Docs Index<h1>
     <ul>
-      <li><Link href={formatPath(introData.__resourcePath)}><a>{introData.title}</a></Link></li>
-      <li><Link href={formatPath(advancedData.__resourcePath)}><a>{advancedData.title}</a></Link></li>
+      {docsPages.map(page => (
+        <li key={page.__resourcePath}>
+          <Link href={formatPath(page.__resourcePath)}>
+            <a>{page.title}</a>
+          </Link>
+        </li>
+      ))}
     </ul>
   </>)
 }
@@ -201,26 +240,42 @@ function formatPath(p) {
 }
 ```
 
-There's a bit to parse here so let's take it step by step.
+This creates an index page of all the MDX pages found within `docs`.
+
+Let's examine the contents of the index page step-by-step:
 
 ```jsx
 import { frontMatter as introData } from './docs/intro.mdx'
 import { frontMatter as advancedData } from './docs/advanced.mdx'
 ```
 
-Here, we import _just the front matter_ from the file we want. We don't need the full docs, we just want to know the title and location so we can link to it. We do the same for both files in our docs. You can probably imagine this would become a little bit of a pain as more docs files are added. I'd recommend [this babel plugin](https://github.com/jescalan/babel-plugin-import-glob-array) to make it easier. Let's see how the code looks after a quick refactor using this plugin:
+First, the index page imports the destructured and renamed front matter from
+each of the docs pages. The front matter contains the title and location.
+
+> Don't repeat yourself: As the number of MDX pages grows, importing each front
+> matter creates more maintenance that can be relieved by
+> [babel-plugin-import-glob-array](https://github.com/jescalan/babel-plugin-import-glob-array).
+> This plugin would enable you to specify this replacement those two imports
+> with this file glob pattern: `import {frontMatter as docsPages} from
+> './docs/*.mdx'`
+
+
+Let's examine the code that renders each link:
 
 ```jsx
-import Link from 'next/link'
-import {frontMatter} from './docs/*.mdx'
-
 export default () => {
+  const docsPages = [ introData, advancedData ]
+
   return (<>
     <h1>Docs Index</h1>
     <ul>
-      {frontMatter.map(page => {
-        <li><Link href={formatPath(page.__resourcePath)}><a>{page.title}</a></Link></li>
-      })}
+      {docsPages.map(page => (
+        <li key={page.__resourcePath}>
+          <Link href={formatPath(page.__resourcePath)}>
+            <a>{page.title}</a>
+          </Link>
+        </li>
+      ))}
     </ul>
   </>)
 }
@@ -230,21 +285,20 @@ function formatPath(p) {
 }
 ```
 
-...much better. And now all we need to do to add a page is to put it in the docs folder. Let's keep going:
+The `__resourcePath` is a property that stores the relative path to the MDX file
+and is automatically included in the front matter. The helper function
+`formatPath` strips the file extension to create a well-formed path to give to
+the NextJS `<Link>` component.
 
-```jsx
-<li>
-  <Link href={formatPath(page.__resourcePath)}>
-    <a>{page.title}</a>
-  </Link>
-</li>
-```
+> Performance tip: A description or summary field could be added to the front
+> matter to keep the import small while enabling the index page to give a
+> preview of the content.
 
-The only thing that should seem unfamiliar here is `__resourcePath` -- this is a special variable that is injected into the front matter for each file, which exposes the path of the file the front matter came from, relative to the root of your project. So the small `formatPath` function below formats the path as a link to its location that we can pass to nextjs' `<Link>` component.
+This same procedure can also be done for layout files.
 
-And you can do the same thing in your layout file in order to allow easy links to other docs pages if needed.
-
-> _Nerd Note:_ If you're a real sharp thinker, you may have noticed that it is seemingly impossible for this previous statement to be true, since importing a mdx file requires rendering into its layout, but its layout also requires all the other mdx files, which each require rendering into their layouts, etc. This is what some may call an infinite loop, and it is impossible. In reality, this plugin does a little dirty work under the hood to make this behavior possible. It also injects a babel plugin which extracts the front matter out to separate temporary files, then transforms any front matter imports into importing from the separate file, which breaks the loop.
+> Implementation note: This plugin injects a babel plugin that extracts the
+> front matter to temporary files. This removes the circular dependency created
+> when a template imports a MDX page that imports that same template.
 
 ## Scanning MDX Content
 
@@ -288,7 +342,8 @@ __scans: {
 }
 ```
 
-Consume these values in the `Layout` with the `__scans` key that is passed in along with anything else the plugin has provided.
+Consume these values in the `Layout` with the `__scans` key that is passed in
+along with anything else the plugin has provided.
 
 ```jsx
 export default plugIn => {
@@ -305,4 +360,6 @@ export default plugIn => {
 
 ```
 
-For more reference and an example use case please see the [`/scan-mdx-content/`](https://github.com/hashicorp/next-mdx-enhanced/tree/master/__tests__/fixtures/scan-mdx-content) test.
+For more reference and an example use case please see the
+[`/scan-mdx-content/`](https://github.com/hashicorp/next-mdx-enhanced/tree/master/__tests__/fixtures/scan-mdx-content)
+test.
