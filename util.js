@@ -3,13 +3,14 @@ const crypto = require('crypto')
 
 async function extendFrontMatter({
   content,
+  frontMatter,
   phase,
   extendFm
 } = {}) {
   if (!extendFm || !extendFm.process) return {}
   if (extendFm.phase !== 'both' && extendFm.phase !== phase) return {}
 
-  return extendFm.process(content)
+  return extendFm.process(content, frontMatter)
 }
 module.exports.extendFrontMatter = extendFrontMatter
 

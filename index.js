@@ -105,23 +105,29 @@ async function extractFrontMatter(pluginOptions, files, root) {
   debug('start: frontmatter extensions')
   const frontMatter = await Promise.all(
     fileContents.map(async (content, idx) => {
-      const extendedFm = await extendFrontMatter({
-        content,
-        phase: 'prebuild',
-        extendFm: pluginOptions.extendFrontMatter
-      })
+      const __resourcePath = files[idx]
+        .replace(path.join(root, 'pages'), '')
+        .substring(1)
 
       const { data } = matter(content, {
         safeLoad: true,
         filename: files[idx]
       })
 
+      const extendedFm = await extendFrontMatter({
+        content,
+        frontMatter: {
+          ...data,
+          __resourcePath
+        },
+        phase: 'prebuild',
+        extendFm: pluginOptions.extendFrontMatter
+      })
+
       return {
         ...data,
         ...extendedFm,
-        __resourcePath: files[idx]
-          .replace(path.join(root, 'pages'), '')
-          .substring(1)
+        __resourcePath
       }
     })
   ).catch(console.error)
