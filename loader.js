@@ -88,6 +88,11 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
 
   const extendedFm = await extendFrontMatter({
     content,
+    frontMatter: {
+      ...frontMatter,
+      __resourcePath: resourcePath,
+      __scans: scans
+    },
     phase: 'loader',
     extendFm: pluginOpts.extendFrontMatter
   })

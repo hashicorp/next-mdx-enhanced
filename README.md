@@ -61,7 +61,7 @@ module.exports = withMdxEnhanced({
   remarkPlugins: [],
   rehypePlugins: [],
   extendFrontMatter: {
-    process: mdxContent => {},
+    process: (mdxContent, frontMatter) => {},
     phase: 'prebuild|loader|both'
   }
 })(/* your normal nextjs config */)
@@ -103,7 +103,7 @@ Array of [rehype plugins](https://mdxjs.com/advanced/plugins#using-remark-and-re
 
 | Property  | Type       | Description                                                                                                                                                           |
 | --------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `process` | `function` | A hook function whose return value will be appended to the processed front matter. This function is given access to the source `.mdx` content as the first parameter. |
+| `process` | `function` | A hook function whose return value will be appended to the processed front matter. This function is given access to the source `.mdx` content as the first parameter and the processed front matter as the second parameter. |
 | `phase`   | `string`   | Used to specify when to run the `process` function. Eligible values are `prebuild`, `loader`, `both`. Defaults to `both` if not specified.                            |
 
 ### scan

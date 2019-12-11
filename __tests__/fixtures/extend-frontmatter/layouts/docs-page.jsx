@@ -8,6 +8,9 @@ export default frontMatter => {
         <p>LAYOUT TEMPLATE</p>
         <h1>{frontMatter.title}</h1>
         <p>
+          All frontMatter: {JSON.stringify(frontMatter)}
+        </p>
+        <p>
           Other docs: {introData.title}, {advancedData.title}
         </p>
         {children}
