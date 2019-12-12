@@ -6,7 +6,7 @@ const nextExport = require('next/dist/export').default
 const glob = require('glob')
 
 // increase timeout since these are integration tests
-jest.setTimeout(20000)
+jest.setTimeout(200000)
 
 test('basic integration test', async () => {
   const basicFixture = path.join(__dirname, 'fixtures/basic')
