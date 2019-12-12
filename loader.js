@@ -92,35 +92,36 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
     extendFm: pluginOpts.extendFrontMatter
   })
 
-  glob(layoutMatcher, (err, matches) => {
-    if (err) throw err
-    if (!matches.length) {
-      throw new Error(
-        `File "${resourcePath}" specified "${frontMatter.layout}" as its layout, but no matching file was found at "${layoutMatcher}"`
-      )
-    }
+  const matches = await new Promise((resolve, reject) => {
+    glob(layoutMatcher, (err, matches) => err ? reject(err) : resolve(matches))
+  })
 
-    const { onContent } = pluginOpts
-    if (onContent && this._compiler.name === 'server') {
-      onContent({
-        ...frontMatter,
-        ...extendedFm,
-        ...{ __resourcePath: resourcePath },
-        content
-      })
-    }
+  if (!matches.length) {
+    throw new Error(
+      `File "${resourcePath}" specified "${frontMatter.layout}" as its layout, but no matching file was found at "${layoutMatcher}"`
+    )
+  }
 
-    // Import the layout, export the layout-wrapped content, pass front matter into layout
-    return `import layout from '${normalizeToUnixPath(layoutPath)}'
-    
-export default layout(${stringifyObject({
+  const { onContent } = pluginOpts
+  if (onContent && this._compiler.name === 'server') {
+    onContent({
       ...frontMatter,
       ...extendedFm,
       ...{ __resourcePath: resourcePath },
-      ...{ __scans: scans }
-    })})
+      content
+    })
+  }
+
+  // Import the layout, export the layout-wrapped content, pass front matter into layout
+  return `import layout from '${normalizeToUnixPath(layoutPath)}'
+
+export default layout(${stringifyObject({
+    ...frontMatter,
+    ...extendedFm,
+    ...{ __resourcePath: resourcePath },
+    ...{ __scans: scans }
+  })})
 
 ${content}
 `
-  })
 }
