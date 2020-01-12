@@ -119,13 +119,27 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
 
   // Import the layout, export the layout-wrapped content, pass front matter into layout
   return `import layout from '${normalizeToUnixPath(layoutPath)}'
+import * as imports from '${normalizeToUnixPath(layoutPath)}'
 
-export default layout(${stringifyObject({
+let frontMatter = ${stringifyObject({
     ...frontMatter,
     ...extendedFm,
     ...{ __resourcePath: resourcePath },
     ...{ __scans: scans }
-  })})
+  })}
+
+if (typeof imports.extendFrontMatter === "function") {
+  frontMatter = {
+    ...frontMatter,
+    ...imports.extendFrontMatter(frontMatter),
+    ...${stringifyObject({
+      ...{ __resourcePath: resourcePath },
+      ...{ __scans: scans }
+    })}
+  }
+}
+
+export default layout(frontMatter)
 
 ${content}
 `
