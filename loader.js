@@ -60,32 +60,6 @@ function scanContent(options, content) {
 async function processLayout(options, frontMatter, content, resourcePath, scans) {
   const { mdxEnhancedPluginOptions: pluginOpts } = options
 
-  // If no layout is provided and the default layout setting is not on, return the
-  // content directly.
-  if (!frontMatter.layout && !pluginOpts.defaultLayout)
-    return content
-
-  // Set the default if the option is active and there's no layout
-  if (!frontMatter.layout && pluginOpts.defaultLayout) {
-    frontMatter.layout = 'index'
-  }
-
-  // Layouts default to resolving from "<root>/layouts", but this is configurable.
-  // If the frontMatter doesn't have a layout and defaultLayout is true, try to
-  // resolve the index file within the layouts path.
-  const layoutPath = path.resolve(
-    options.dir,
-    pluginOpts.layoutPath,
-    frontMatter.layout
-  )
-
-  // If the layout doesn't exist, throw a descriptive error
-  // We use glob to check for existence, since the file could have multiple page
-  // extensions depending on the config
-  const layoutMatcher = `${layoutPath}.+(${options.config.pageExtensions.join(
-    '|'
-  )})`
-
   const extendedFm = await extendFrontMatter({
     content,
     frontMatter: {
@@ -97,22 +71,54 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
     extendFm: pluginOpts.extendFrontMatter
   })
 
+  const mergedFrontMatter = {
+    ...frontMatter,
+    ...extendedFm,
+      __resourcePath: resourcePath,
+      __scans: scans
+  }
+
+  // If no layout is provided and the default layout setting is not on, return the
+  // content directly.
+  if (!mergedFrontMatter.layout && !pluginOpts.defaultLayout)
+    return content
+
+  // Set the default if the option is active and there's no layout
+  if (!mergedFrontMatter.layout && pluginOpts.defaultLayout) {
+    mergedFrontMatter.layout = 'index'
+  }
+
+  // Layouts default to resolving from "<root>/layouts", but this is configurable.
+  // If the frontMatter doesn't have a layout and defaultLayout is true, try to
+  // resolve the index file within the layouts path.
+  const layoutPath = path.resolve(
+    options.dir,
+    pluginOpts.layoutPath,
+    mergedFrontMatter.layout
+  )
+
+  // If the layout doesn't exist, throw a descriptive error
+  // We use glob to check for existence, since the file could have multiple page
+  // extensions depending on the config
+  const layoutMatcher = `${layoutPath}.+(${options.config.pageExtensions.join(
+    '|'
+  )})`
+
+
   const matches = await new Promise((resolve, reject) => {
     glob(layoutMatcher, (err, matches) => err ? reject(err) : resolve(matches))
   })
 
   if (!matches.length) {
     throw new Error(
-      `File "${resourcePath}" specified "${frontMatter.layout}" as its layout, but no matching file was found at "${layoutMatcher}"`
+      `File "${resourcePath}" specified "${mergedFrontMatter.layout}" as its layout, but no matching file was found at "${layoutMatcher}"`
     )
   }
 
   const { onContent } = pluginOpts
   if (onContent && this._compiler.name === 'server') {
     onContent({
-      ...frontMatter,
-      ...extendedFm,
-      ...{ __resourcePath: resourcePath },
+      ...mergedFrontMatter,
       content
     })
   }
@@ -120,13 +126,7 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
   // Import the layout, export the layout-wrapped content, pass front matter into layout
   return `import layout from '${normalizeToUnixPath(layoutPath)}'
 
-export * from '${normalizeToUnixPath(layoutPath)}'
-export default layout(${stringifyObject({
-    ...frontMatter,
-    ...extendedFm,
-    ...{ __resourcePath: resourcePath },
-    ...{ __scans: scans }
-  })})
+export default layout(${stringifyObject(mergedFrontMatter)})
 
 ${content}
 `

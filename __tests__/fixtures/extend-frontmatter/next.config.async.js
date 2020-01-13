@@ -7,6 +7,7 @@ module.exports = withMdxEnhanced({
         setTimeout(() => {
           return resolve({
             __async: 'this data is async',
+            layout: 'docs-page',
             reversePath: frontMatter.__resourcePath.split('').reverse().join('')
           })
         }, 50)
