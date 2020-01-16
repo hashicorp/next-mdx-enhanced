@@ -38,6 +38,12 @@ test('options.layoutPath and options.defaultLayout', async () => {
   )
 })
 
+test('exports ssg functions from layout', async () => {
+  const layoutSSGExportFixture = path.join(__dirname, 'fixtures/layout-exports-ssg')
+  const outPath = await compileNextjs(layoutSSGExportFixture)
+  expectContentMatch(outPath, 'docs/intro.html', /Hello world/)
+})
+
 describe('options.extendFrontMatter', () => {
   it('should work with a sync process fn', async () => {
     const extendFmFixture = path.join(__dirname, 'fixtures/extend-frontmatter')
