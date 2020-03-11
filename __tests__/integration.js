@@ -38,7 +38,7 @@ test('options.layoutPath and options.defaultLayout', async () => {
   )
 })
 
-test('exports ssg functions from layout', async () => {
+test.only('exports ssg functions from layout', async () => {
   const layoutSSGExportFixture = path.join(__dirname, 'fixtures/layout-exports-ssg')
   const outPath = await compileNextjs(layoutSSGExportFixture)
   expectContentMatch(outPath, 'docs/intro.html', /Hello world/)
@@ -97,11 +97,11 @@ test('options.onContent', async () => {
 
 // Remove artifacts
 afterAll(() => {
-  return Promise.all([
-    rmfr(path.join(__dirname, 'fixtures/*/out'), { glob: true }),
-    rmfr(path.join(__dirname, 'fixtures/*/.mdx-data'), { glob: true }),
-    rmfr(path.join(__dirname, 'fixtures/*/.next'), { glob: true })
-  ])
+  // return Promise.all([
+  //   rmfr(path.join(__dirname, 'fixtures/*/out'), { glob: true }),
+  //   rmfr(path.join(__dirname, 'fixtures/*/.mdx-data'), { glob: true }),
+  //   rmfr(path.join(__dirname, 'fixtures/*/.next'), { glob: true })
+  // ])
 })
 
 // Test Utilities
