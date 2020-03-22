@@ -157,7 +157,7 @@ The plugin's `layoutPath` option defaults to `layouts`.
 
 The file extension of the template must be one of configured [pageExtensions](https://nextjs.org/docs#configuring-extensions-looked-for-when-resolving-pages-in-pages).
 
-The template, defined in `layoutes/docs-page.jsx`, looks like the following:
+The template, defined in `layouts/docs-page.jsx`, looks like the following:
 
 ```jsx
 export default frontMatter => {
