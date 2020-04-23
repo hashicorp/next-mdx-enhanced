@@ -1,7 +1,6 @@
 import { frontMatter as other} from '../pages/docs/intro.mdx'
 
 export async function getStaticProps() {
-  console.log('getStaticProps called')
   return {props: {}}
 }
 
