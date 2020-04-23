@@ -4,6 +4,7 @@ const rmfr = require('rmfr')
 const nextBuild = require('next/dist/build').default
 const nextExport = require('next/dist/export').default
 const glob = require('glob')
+const execa = require("execa")
 
 // increase timeout since these are integration tests
 jest.setTimeout(200000)
@@ -38,6 +39,12 @@ test('options.layoutPath and options.defaultLayout', async () => {
   )
 })
 
+test('exports ssg functions from layout', async () => {
+  const layoutSSGExportFixture = path.join(__dirname, 'fixtures/layout-exports-ssg')
+  const outPath = await compileNextjs(layoutSSGExportFixture)
+  return expectContentMatch(outPath, 'docs/intro.html', /Hello world/)
+})
+
 describe('options.extendFrontMatter', () => {
   it('should work with a sync process fn', async () => {
     const extendFmFixture = path.join(__dirname, 'fixtures/extend-frontmatter')
@@ -47,8 +54,8 @@ describe('options.extendFrontMatter', () => {
   })
 
   it('should work with an async process fn', async () => {
-    const extendFmFixture = path.join(__dirname, 'fixtures/extend-frontmatter')
-    const outPath = await compileNextjs(extendFmFixture, 'next.config.async.js')
+    const extendFmFixture = path.join(__dirname, 'fixtures/extend-frontmatter-async')
+    const outPath = await compileNextjs(extendFmFixture)
     expectContentMatch(outPath, 'index.html', /Hello world/)
     expectContentMatch(outPath, 'docs/intro.html', /ortni\/scod/)
   })
@@ -100,17 +107,11 @@ afterAll(() => {
 
 // Test Utilities
 
-function compileNextjs(projectPath, configPath = 'next.config.js') {
-  const config = require(path.join(projectPath, configPath))
+async function compileNextjs(projectPath) {
   const outPath = path.join(projectPath, 'out')
-  return nextBuild(projectPath, config)
-    .then(() => {
-      return nextExport(projectPath, {
-        outdir: outPath,
-        silent: true
-      })
-    })
-    .then(() => outPath)
+  await execa("next", ["build", projectPath], { preferLocal: true, cwd: projectPath })
+  await execa("next", ["export", projectPath], { preferLocal: true, cwd: projectPath })
+  return outPath
 }
 
 function expectContentMatch(outPath, filePath, matcher) {
