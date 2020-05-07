@@ -23,16 +23,29 @@ module.exports = async function mdxEnhancedLoader(src) {
   }
   // Scan for plugin `scan` option to return results based on RegEx patterns provided in config
   const scans = scanContent(options, content)
-  // Get file path relative to project root
-  const resourcePath = normalizeToUnixPath(this.resourcePath)
-    .replace(
-      normalizeToUnixPath(
-        path.join(normalizeToUnixPath(this.rootContext), 'pages')
-      ),
-      ''
-    )
-    .substring(1)
+  
+  const normalizedResourcePath = normalizeToUnixPath(this.resourcePath);
 
+  let pageDirectoryPath = '';
+
+  const { mdxEnhancedUsesSrc: usesSrc } = options;
+
+  if(usesSrc) {
+    // 2. Add `src/pages` to root path
+    pageDirectoryPath = normalizeToUnixPath(
+      path.join(normalizeToUnixPath(this.rootContext), 'src/pages')
+    );
+  } else {
+    pageDirectoryPath = normalizeToUnixPath(
+      path.join(normalizeToUnixPath(this.rootContext), 'pages')
+    );
+  }
+
+  // Get file path relative to project root
+  const resourcePath = normalizedResourcePath.replace(
+     pageDirectoryPath, ''
+    ).substring(1)
+  
   // Checks if there's a layout, if there is, resolve the layout and wrap the content in it.
   processLayout
     .call(this, options, data, content, resourcePath, scans)
@@ -80,9 +93,10 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
 
   // If no layout is provided and the default layout setting is not on, return the
   // content directly.
-  if (!mergedFrontMatter.layout && !pluginOpts.defaultLayout)
+  if (!mergedFrontMatter.layout && !pluginOpts.defaultLayout) {
     return content
-
+  }
+    
   // Set the default if the option is active and there's no layout
   if (!mergedFrontMatter.layout && pluginOpts.defaultLayout) {
     mergedFrontMatter.layout = 'index'
