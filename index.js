@@ -31,11 +31,11 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
     pluginOptions.extendFrontMatter.phase = 'both'
   }
 
-  return Object.assign({}, nextConfig, { 
+  return Object.assign({}, nextConfig, {
     webpack(config, options) {
       // Check whether `src/pages` exists
-      const usesSrc = fs.existsSync(path.join(config.context, '/src/pages'));
-      pluginOptions.usesSrc = usesSrc;
+      const usesSrc = fs.existsSync(path.join(config.context, '/src/pages'))
+      pluginOptions.usesSrc = usesSrc
       // Add mdx webpack loader stack
       config.module.rules.push({
         test: new RegExp(`\\.(${pluginOptions.fileExtensions.join('|')})$`),
@@ -106,23 +106,23 @@ async function extractFrontMatter(pluginOptions, files, root) {
   const frontMatter = await Promise.all(
     fileContents.map(async (content, idx) => {
       // The next steps serve to support placing pages under `src/pages`:
-      
-      let __resourcePath = '';
+
+      let __resourcePath = ''
 
       // 2. Create resource path from file path if using `src/pages`
-      if(pluginOptions.usesSrc) {
+      if (pluginOptions.usesSrc) {
         // Add `src/` to the resource path
         __resourcePath = files[idx]
-        .replace(path.join(root, "src/" , 'pages'), '')
-        .substring(1)
+          .replace(path.join(root, 'src/', 'pages'), '')
+          .substring(1)
       } else {
-        // Otherwise return default 
+        // Otherwise return default
         __resourcePath = files[idx]
-        .replace(path.join(root, 'pages'), '')
-        .substring(1)
+          .replace(path.join(root, 'pages'), '')
+          .substring(1)
       }
 
-      __resourcePath = normalizeToUnixPath(__resourcePath);
+      __resourcePath = normalizeToUnixPath(__resourcePath)
 
       const { data } = matter(content, {
         safeLoad: true,

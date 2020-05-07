@@ -23,29 +23,29 @@ module.exports = async function mdxEnhancedLoader(src) {
   }
   // Scan for plugin `scan` option to return results based on RegEx patterns provided in config
   const scans = scanContent(options, content)
-  
-  const normalizedResourcePath = normalizeToUnixPath(this.resourcePath);
 
-  let pageDirectoryPath = '';
+  const normalizedResourcePath = normalizeToUnixPath(this.resourcePath)
 
-  const { mdxEnhancedUsesSrc: usesSrc } = options;
+  let pageDirectoryPath = ''
 
-  if(usesSrc) {
+  const { mdxEnhancedUsesSrc: usesSrc } = options
+
+  if (usesSrc) {
     // 2. Add `src/pages` to root path
     pageDirectoryPath = normalizeToUnixPath(
       path.join(normalizeToUnixPath(this.rootContext), 'src/pages')
-    );
+    )
   } else {
     pageDirectoryPath = normalizeToUnixPath(
       path.join(normalizeToUnixPath(this.rootContext), 'pages')
-    );
+    )
   }
 
   // Get file path relative to project root
-  const resourcePath = normalizedResourcePath.replace(
-     pageDirectoryPath, ''
-    ).substring(1)
-  
+  const resourcePath = normalizedResourcePath
+    .replace(pageDirectoryPath, '')
+    .substring(1)
+
   // Checks if there's a layout, if there is, resolve the layout and wrap the content in it.
   processLayout
     .call(this, options, data, content, resourcePath, scans)
