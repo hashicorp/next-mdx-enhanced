@@ -3,3 +3,4 @@ __tests__/fixtures/*/.next
 __tests__/fixtures/*/.mdx-data
 __tests__/fixtures/*/out
 .DS_Store
+.vscode

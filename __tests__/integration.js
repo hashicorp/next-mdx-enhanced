@@ -9,6 +9,21 @@ const spawn = require('cross-spawn')
 // increase timeout since these are integration tests
 jest.setTimeout(200000)
 
+test('pages in src folder', async () => {
+  const basicFixture = path.join(__dirname, 'fixtures/src-folder')
+  const outPath = await compileNextjs(basicFixture)
+  expectContentMatch(outPath, 'index.html', /Hello world/)
+  expectContentMatch(outPath, 'docs/advanced.html', /<p>LAYOUT TEMPLATE<\/p>/)
+  expectContentMatch(outPath, 'docs/advanced.html', /<h1>Advanced Docs<\/h1>/)
+  expectContentMatch(outPath, 'docs/intro.html', /<p>LAYOUT TEMPLATE<\/p>/)
+  expectContentMatch(outPath, 'docs/intro.html', /<h1>Intro Docs<\/h1>/)
+  expectContentMatch(
+    outPath,
+    'docs/intro.html',
+    /some <em>introductory<\/em> docs content/
+  )
+})
+
 test('basic integration test', async () => {
   const basicFixture = path.join(__dirname, 'fixtures/basic')
   const outPath = await compileNextjs(basicFixture)
