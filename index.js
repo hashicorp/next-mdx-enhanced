@@ -55,7 +55,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
       })
 
       // Add babel plugin to rewrite front matter imports
-      config.module.rules = injectBabelPlugin(
+      config.module.rules = dangerouslyInjectBabelPlugin(
         config.module.rules,
         babelPluginFrontmatter(options, pluginOptions)
       )
@@ -144,27 +144,31 @@ async function extractFrontMatter(pluginOptions, files, root) {
   })
 }
 
-function injectBabelPlugin(rules, plugin) {
+function dangerouslyInjectBabelPlugin(rules, plugin) {
   return rules.map((rule) => {
     if (!rule.use) return rule
 
-    // for the server-side config `rule.use` is an array but contains a `loader`
-    // property where the babel loader is located. on the client-side config, the
-    // babel loader is one of the items in the array. we need to inject into both
-    // of these situations for the loader to apply to both client & server builds.
+    // `use` can either be an array or an object - we handle both scenarios here
     if (Array.isArray(rule.use)) {
       for (let i = 0; i < rule.use.length; i++) {
         if (rule.use[i].loader === 'next-babel-loader') {
-          if (!rule.use[i].options.plugins) rule.use[i].options.plugins = []
-          rule.use[i].options.plugins.push(plugin)
-          console.log(rule.use[i])
+          rule.use[i] = _inject(rule.use[i], plugin)
         }
       }
     } else if (rule.use.loader === 'next-babel-loader') {
-      if (!rule.use.options.plugins) rule.use.options.plugins = []
-      rule.use.options.plugins.push(plugin)
+      rule.use = _inject(rule.use, plugin)
     }
 
     return rule
   })
+}
+
+function _inject(rule, plugin) {
+  // create a plugins property if not already present
+  if (!rule.options.plugins) rule.options.plugins = []
+  // push the plugin if its not already there
+  if (!rule.options.plugins.find((p) => p.name === plugin.name)) {
+    rule.options.plugins.push(plugin)
+  }
+  return rule
 }
