@@ -55,26 +55,10 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
       })
 
       // Add babel plugin to rewrite front matter imports
-      config.module.rules = config.module.rules.map((rule) => {
-        if (rule.use) {
-          if (Array.isArray(rule.use)) {
-            // client babel config is different from server - this is client
-            if (rule.use[1] && rule.use[1].loader === 'next-babel-loader') {
-              if (!rule.use[1].options.plugins) rule.use[1].options.plugins = []
-              rule.use[1].options.plugins.push(
-                babelPluginFrontmatter(options, pluginOptions)
-              )
-            }
-            // and this is server
-          } else if (rule.use.loader === 'next-babel-loader') {
-            if (!rule.use.options.plugins) rule.use.options.plugins = []
-            rule.use.options.plugins.push(
-              babelPluginFrontmatter(options, pluginOptions)
-            )
-          }
-        }
-        return rule
-      })
+      config.module.rules = injectBabelPlugin(
+        config.module.rules,
+        babelPluginFrontmatter(options, pluginOptions)
+      )
 
       // Add webpack plugin that extracts front matter
       config.plugins.push(
@@ -157,5 +141,30 @@ async function extractFrontMatter(pluginOptions, files, root) {
     })
   ).then(() => {
     debug('finish: write data files')
+  })
+}
+
+function injectBabelPlugin(rules, plugin) {
+  return rules.map((rule) => {
+    if (!rule.use) return rule
+
+    // for the server-side config `rule.use` is an array but contains a `loader`
+    // property where the babel loader is located. on the client-side config, the
+    // babel loader is one of the items in the array. we need to inject into both
+    // of these situations for the loader to apply to both client & server builds.
+    if (Array.isArray(rule.use)) {
+      for (let i = 0; i < rule.use.length; i++) {
+        if (rule.use[i].loader === 'next-babel-loader') {
+          if (!rule.use[i].options.plugins) rule.use[i].options.plugins = []
+          rule.use[i].options.plugins.push(plugin)
+          console.log(rule.use[i])
+        }
+      }
+    } else if (rule.use.loader === 'next-babel-loader') {
+      if (!rule.use.options.plugins) rule.use.options.plugins = []
+      rule.use.options.plugins.push(plugin)
+    }
+
+    return rule
   })
 }
