@@ -17,7 +17,7 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   }
 
   // Add supported file extensions as page extensions so that mdx files are compiled as pages
-  pluginOptions.fileExtensions.forEach(ext => {
+  pluginOptions.fileExtensions.forEach((ext) => {
     if (nextConfig.pageExtensions.indexOf(ext) === -1) {
       nextConfig.pageExtensions.unshift(ext)
     }
@@ -42,28 +42,23 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
             loader: '@mdx-js/loader',
             options: {
               remarkPlugins: pluginOptions.remarkPlugins || [],
-              rehypePlugins: pluginOptions.rehypePlugins || []
-            }
+              rehypePlugins: pluginOptions.rehypePlugins || [],
+            },
           },
           {
             loader: path.join(__dirname, 'loader'),
             options: Object.assign({}, options, {
-              mdxEnhancedPluginOptions: pluginOptions
-            })
-          }
-        ]
+              mdxEnhancedPluginOptions: pluginOptions,
+            }),
+          },
+        ],
       })
 
       // Add babel plugin to rewrite front matter imports
-      config.module.rules = config.module.rules.map(rule => {
-        if (rule.use && rule.use.loader === 'next-babel-loader') {
-          if (!rule.use.options.plugins) rule.use.options.plugins = []
-          rule.use.options.plugins.push(
-            babelPluginFrontmatter(options, pluginOptions)
-          )
-        }
-        return rule
-      })
+      config.module.rules = dangerouslyInjectBabelPlugin(
+        config.module.rules,
+        babelPluginFrontmatter(options, pluginOptions)
+      )
 
       // Add webpack plugin that extracts front matter
       config.plugins.push(
@@ -81,8 +76,8 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
                 ? `**/*.{${pluginOptions.fileExtensions.join(',')}}`
                 : `**/*.${pluginOptions.fileExtensions[0]}`,
             options: { cwd: config.context },
-            addFilesAsDependencies: true
-          }
+            addFilesAsDependencies: true,
+          },
         })
       )
 
@@ -92,16 +87,18 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
       }
 
       return config
-    }
+    },
   })
 }
 
 // Given an array of absolute file paths, write out the front matter to a json file
 async function extractFrontMatter(pluginOptions, files, root) {
   debug('start: read all mdx files')
-  const fileContents = await Promise.all(files.map(f => fs.readFile(f, 'utf8')))
+  const fileContents = await Promise.all(
+    files.map((f) => fs.readFile(f, 'utf8'))
+  )
   debug('finish: read all mdx files')
-  const fmPaths = files.map(f => generateFrontmatterPath(f, root))
+  const fmPaths = files.map((f) => generateFrontmatterPath(f, root))
   debug('start: frontmatter extensions')
   const frontMatter = await Promise.all(
     fileContents.map(async (content, idx) => {
@@ -111,23 +108,23 @@ async function extractFrontMatter(pluginOptions, files, root) {
 
       const { data } = matter(content, {
         safeLoad: true,
-        filename: files[idx]
+        filename: files[idx],
       })
 
       const extendedFm = await extendFrontMatter({
         content,
         frontMatter: {
           ...data,
-          __resourcePath
+          __resourcePath,
         },
         phase: 'prebuild',
-        extendFm: pluginOptions.extendFrontMatter
+        extendFm: pluginOptions.extendFrontMatter,
       })
 
       return {
         ...data,
         ...extendedFm,
-        __resourcePath
+        __resourcePath,
       }
     })
   ).catch(console.error)
@@ -135,7 +132,7 @@ async function extractFrontMatter(pluginOptions, files, root) {
   // https://github.com/zeit/next.js/issues/8068
   debug('finish: frontmatter extensions')
   debug('start: .mdx-data creation')
-  await Promise.all(fmPaths.map(fmPath => fs.ensureDir(path.dirname(fmPath))))
+  await Promise.all(fmPaths.map((fmPath) => fs.ensureDir(path.dirname(fmPath))))
   debug('finish: .mdx-data creation')
   debug('start: write data files')
   return Promise.all(
@@ -145,4 +142,32 @@ async function extractFrontMatter(pluginOptions, files, root) {
   ).then(() => {
     debug('finish: write data files')
   })
+}
+
+function dangerouslyInjectBabelPlugin(rules, plugin) {
+  return rules.map((rule) => {
+    if (!rule.use) return rule
+
+    // `use` can either be an array or an object - we handle both scenarios here
+    if (Array.isArray(rule.use)) {
+      for (let i = 0; i < rule.use.length; i++) {
+        rule.use[i] = _inject(rule.use[i], plugin)
+      }
+    } else {
+      rule.use = _inject(rule.use, plugin)
+    }
+
+    return rule
+  })
+}
+
+function _inject(rule, plugin) {
+  if (rule.loader !== 'next-babel-loader') return rule
+  // create a plugins property if not already present
+  if (!rule.options.plugins) rule.options.plugins = []
+  // push the plugin if its not already there
+  if (!rule.options.plugins.find((p) => p.name === plugin.name)) {
+    rule.options.plugins.push(plugin)
+  }
+  return rule
 }

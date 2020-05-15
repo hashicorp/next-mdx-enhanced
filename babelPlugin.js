@@ -20,7 +20,7 @@ module.exports = function nextBabelWrapper(nextConfig, pluginOptions) {
             return
 
           // if there are no "frontMatter" imports, do nothing
-          const frontMatterSpecifier = _path.node.specifiers.find(s =>
+          const frontMatterSpecifier = _path.node.specifiers.find((s) =>
             importsFrontMatter(s)
           )
           if (!frontMatterSpecifier) return
@@ -57,8 +57,8 @@ module.exports = function nextBabelWrapper(nextConfig, pluginOptions) {
             }, [])
           }
           debug(`finish: extracting frontmatter for ${importPath}`)
-        }
-      }
+        },
+      },
     }
   }
 }

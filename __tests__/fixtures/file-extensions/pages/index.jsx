@@ -1,7 +1,7 @@
 import { frontMatter as mdExtension } from './test.md'
 import { frontMatter as mdxExtension } from './test.mdx'
 
-export default () => {
+export default function Page() {
   return (
     <>
       <p>

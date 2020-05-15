@@ -1,10 +1,10 @@
-import { frontMatter as other} from '../pages/docs/intro.mdx'
+import { frontMatter as other } from '../pages/docs/intro.mdx'
 
 export async function getStaticProps() {
-  return {props: {}}
+  return { props: {} }
 }
 
-export default (frontMatter) => {
+export default function Page(frontMatter) {
   return function docsPageLayout({ children }) {
     return (
       <>

@@ -4,7 +4,7 @@ const rmfr = require('rmfr')
 const nextBuild = require('next/dist/build').default
 const nextExport = require('next/dist/export').default
 const glob = require('glob')
-const execa = require("execa")
+const spawn = require('cross-spawn')
 
 // increase timeout since these are integration tests
 jest.setTimeout(200000)
@@ -40,7 +40,10 @@ test('options.layoutPath and options.defaultLayout', async () => {
 })
 
 test('exports ssg functions from layout', async () => {
-  const layoutSSGExportFixture = path.join(__dirname, 'fixtures/layout-exports-ssg')
+  const layoutSSGExportFixture = path.join(
+    __dirname,
+    'fixtures/layout-exports-ssg'
+  )
   const outPath = await compileNextjs(layoutSSGExportFixture)
   return expectContentMatch(outPath, 'docs/intro.html', /Hello world/)
 })
@@ -54,7 +57,10 @@ describe('options.extendFrontMatter', () => {
   })
 
   it('should work with an async process fn', async () => {
-    const extendFmFixture = path.join(__dirname, 'fixtures/extend-frontmatter-async')
+    const extendFmFixture = path.join(
+      __dirname,
+      'fixtures/extend-frontmatter-async'
+    )
     const outPath = await compileNextjs(extendFmFixture)
     expectContentMatch(outPath, 'index.html', /Hello world/)
     expectContentMatch(outPath, 'docs/intro.html', /ortni\/scod/)
@@ -87,7 +93,7 @@ test('options.onContent', async () => {
     if (err) throw err
     mdxPageCount = files.length
   })
-  const mockCallback = jest.fn(content => console.log(content))
+  const mockCallback = jest.fn((content) => console.log(content))
   const compile = await compileNextjsWithMockFunction(
     onContentFixture,
     'next.config-mock.js',
@@ -101,17 +107,22 @@ afterAll(() => {
   return Promise.all([
     rmfr(path.join(__dirname, 'fixtures/*/out'), { glob: true }),
     rmfr(path.join(__dirname, 'fixtures/*/.mdx-data'), { glob: true }),
-    rmfr(path.join(__dirname, 'fixtures/*/.next'), { glob: true })
+    rmfr(path.join(__dirname, 'fixtures/*/.next'), { glob: true }),
   ])
 })
 
 // Test Utilities
-
 async function compileNextjs(projectPath) {
-  const outPath = path.join(projectPath, 'out')
-  await execa("next", ["build", projectPath], { preferLocal: true, cwd: projectPath })
-  await execa("next", ["export", projectPath], { preferLocal: true, cwd: projectPath })
-  return outPath
+  const nextLocal = path.join(__dirname, '../node_modules/.bin/next')
+  spawn.sync(nextLocal, ['build', projectPath], {
+    stdio: 'inherit',
+    cwd: projectPath,
+  })
+  spawn.sync(nextLocal, ['export', projectPath], {
+    stdio: 'inherit',
+    cwd: projectPath,
+  })
+  return path.join(projectPath, 'out')
 }
 
 function expectContentMatch(outPath, filePath, matcher) {
@@ -129,7 +140,7 @@ function compileNextjsWithMockFunction(
   return nextBuild(projectPath, config(mockFn)).then(() => {
     return nextExport(projectPath, {
       outdir: outPath,
-      silent: true
+      silent: true,
     }).then(() => mockFn)
   })
 }

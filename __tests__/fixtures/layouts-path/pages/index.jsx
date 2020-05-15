@@ -1,7 +1,7 @@
 import { frontMatter as introData } from './docs/intro.mdx'
 import { frontMatter as advancedData } from './docs/advanced.mdx'
 
-export default () => {
+export default function Page() {
   return (
     <>
       <p>Hello world</p>

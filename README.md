@@ -62,8 +62,8 @@ module.exports = withMdxEnhanced({
   rehypePlugins: [],
   extendFrontMatter: {
     process: (mdxContent, frontMatter) => {},
-    phase: 'prebuild|loader|both'
-  }
+    phase: 'prebuild|loader|both',
+  },
 })(/* your normal nextjs config */)
 ```
 
@@ -101,10 +101,10 @@ Array of [rehype plugins](https://mdxjs.com/advanced/plugins#using-remark-and-re
 
 > `object` | optional
 
-| Property  | Type       | Description                                                                                                                                                           |
-| --------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Property  | Type       | Description                                                                                                                                                                                                                  |
+| --------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `process` | `function` | A hook function whose return value will be appended to the processed front matter. This function is given access to the source `.mdx` content as the first parameter and the processed front matter as the second parameter. |
-| `phase`   | `string`   | Used to specify when to run the `process` function. Eligible values are `prebuild`, `loader`, `both`. Defaults to `both` if not specified.                            |
+| `phase`   | `string`   | Used to specify when to run the `process` function. Eligible values are `prebuild`, `loader`, `both`. Defaults to `both` if not specified.                                                                                   |
 
 ### scan
 
@@ -160,7 +160,7 @@ The file extension of the template must be one of configured [pageExtensions](ht
 The template, defined in `layouts/docs-page.jsx`, looks like the following:
 
 ```jsx
-export default frontMatter => {
+export default function Layout(frontMatter) {
   return ({ children: content }) => {
     return (
       <div>
@@ -201,14 +201,14 @@ import Link from 'next/link'
 import { frontMatter as introData } from './docs/intro.mdx'
 import { frontMatter as advancedData } from './docs/advanced.mdx'
 
-export default () => {
+export default function DocsPage() {
   const docsPages = [introData, advancedData]
 
   return (
     <>
       <h1>Docs Index</h1>
       <ul>
-        {docsPages.map(page => (
+        {docsPages.map((page) => (
           <li key={page.__resourcePath}>
             <Link href={formatPath(page.__resourcePath)}>
               <a>{page.title}</a>
@@ -245,14 +245,14 @@ First, the index page imports the destructured and renamed front matter from eac
 Let's examine the code that renders each link:
 
 ```jsx
-export default () => {
+export default function DocsPage() {
   const docsPages = [introData, advancedData]
 
   return (
     <>
       <h1>Docs Index</h1>
       <ul>
-        {docsPages.map(page => (
+        {docsPages.map((page) => (
           <li key={page.__resourcePath}>
             <Link href={formatPath(page.__resourcePath)}>
               <a>{page.title}</a>
