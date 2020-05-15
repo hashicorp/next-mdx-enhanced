@@ -151,11 +151,9 @@ function dangerouslyInjectBabelPlugin(rules, plugin) {
     // `use` can either be an array or an object - we handle both scenarios here
     if (Array.isArray(rule.use)) {
       for (let i = 0; i < rule.use.length; i++) {
-        if (rule.use[i].loader === 'next-babel-loader') {
-          rule.use[i] = _inject(rule.use[i], plugin)
-        }
+        rule.use[i] = _inject(rule.use[i], plugin)
       }
-    } else if (rule.use.loader === 'next-babel-loader') {
+    } else {
       rule.use = _inject(rule.use, plugin)
     }
 
@@ -164,6 +162,7 @@ function dangerouslyInjectBabelPlugin(rules, plugin) {
 }
 
 function _inject(rule, plugin) {
+  if (rule.loader !== 'next-babel-loader') return rule
   // create a plugins property if not already present
   if (!rule.options.plugins) rule.options.plugins = []
   // push the plugin if its not already there
