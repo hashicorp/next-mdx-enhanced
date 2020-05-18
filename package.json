@@ -32,6 +32,11 @@
     "webpack": "^4.43.0"
   },
   "homepage": "https://github.com/hashicorp/next-plugin-mdx-enhanced#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
   "jest": {
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
