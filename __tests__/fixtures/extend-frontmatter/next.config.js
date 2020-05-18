@@ -6,7 +6,7 @@ module.exports = withMdxEnhanced({
       return {
         __outline: 'outline stuff',
         layout: 'docs-page',
-        reversePath: frontMatter.__resourcePath.split('').reverse().join('')
+        reversePath: frontMatter.__resourcePath.split('').reverse().join(''),
       }
     },
   },

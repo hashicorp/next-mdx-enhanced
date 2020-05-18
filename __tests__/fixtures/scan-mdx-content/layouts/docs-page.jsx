@@ -1,6 +1,6 @@
 import { frontMatter as introData } from '../pages/docs/intro.mdx'
 import { frontMatter as advancedData } from '../pages/docs/advanced.mdx'
-export default frontMatter => {
+export default (frontMatter) => {
   const __scans = frontMatter.__scans
   return function docsPageLayout({ children }) {
     return (

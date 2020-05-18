@@ -36,8 +36,8 @@ module.exports = async function mdxEnhancedLoader(src) {
   // Checks if there's a layout, if there is, resolve the layout and wrap the content in it.
   processLayout
     .call(this, options, data, content, resourcePath, scans)
-    .then(result => callback(null, result))
-    .catch(err => callback(err))
+    .then((result) => callback(null, result))
+    .catch((err) => callback(err))
 }
 function scanContent(options, content) {
   const { mdxEnhancedPluginOptions: pluginOpts } = options
@@ -57,7 +57,13 @@ function scanContent(options, content) {
     return acc
   }, {})
 }
-async function processLayout(options, frontMatter, content, resourcePath, scans) {
+async function processLayout(
+  options,
+  frontMatter,
+  content,
+  resourcePath,
+  scans
+) {
   const { mdxEnhancedPluginOptions: pluginOpts } = options
 
   const extendedFm = await extendFrontMatter({
@@ -65,23 +71,22 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
     frontMatter: {
       ...frontMatter,
       __resourcePath: resourcePath,
-      __scans: scans
+      __scans: scans,
     },
     phase: 'loader',
-    extendFm: pluginOpts.extendFrontMatter
+    extendFm: pluginOpts.extendFrontMatter,
   })
 
   const mergedFrontMatter = {
     ...frontMatter,
     ...extendedFm,
-      __resourcePath: resourcePath,
-      __scans: scans
+    __resourcePath: resourcePath,
+    __scans: scans,
   }
 
   // If no layout is provided and the default layout setting is not on, return the
   // content directly.
-  if (!mergedFrontMatter.layout && !pluginOpts.defaultLayout)
-    return content
+  if (!mergedFrontMatter.layout && !pluginOpts.defaultLayout) return content
 
   // Set the default if the option is active and there's no layout
   if (!mergedFrontMatter.layout && pluginOpts.defaultLayout) {
@@ -104,9 +109,10 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
     '|'
   )})`
 
-
   const matches = await new Promise((resolve, reject) => {
-    glob(layoutMatcher, (err, matches) => err ? reject(err) : resolve(matches))
+    glob(layoutMatcher, (err, matches) =>
+      err ? reject(err) : resolve(matches)
+    )
   })
 
   if (!matches.length) {
@@ -119,7 +125,7 @@ async function processLayout(options, frontMatter, content, resourcePath, scans)
   if (onContent && this._compiler.name === 'server') {
     onContent({
       ...mergedFrontMatter,
-      content
+      content,
     })
   }
 

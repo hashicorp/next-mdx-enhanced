@@ -1,6 +1,6 @@
 const withMdxEnhanced = require('../../..')
 
-module.exports = configFn =>
+module.exports = (configFn) =>
   withMdxEnhanced({
-    onContent: mdxContent => configFn(mdxContent)
+    onContent: (mdxContent) => configFn(mdxContent),
   })()

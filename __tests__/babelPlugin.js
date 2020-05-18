@@ -9,7 +9,7 @@ test('transforms as intended', () => {
   const { content, filename } = loadFixture('basic')
   const { code } = transform(content, {
     plugins: [plugin(mockNextOptions, mockPluginOptions)],
-    filename
+    filename,
   })
   expect(code).toMatchSnapshot()
 })

@@ -1,7 +1,7 @@
 const withMdxEnhanced = require('../../..')
 
 module.exports = withMdxEnhanced({
-  onContent: mdxContent => processContent(mdxContent)
+  onContent: (mdxContent) => processContent(mdxContent),
 })()
 
 function processContent(content) {

@@ -5,7 +5,7 @@ async function extendFrontMatter({
   content,
   frontMatter,
   phase,
-  extendFm
+  extendFm,
 } = {}) {
   if (!extendFm || !extendFm.process) return {}
   if (extendFm.phase !== 'both' && extendFm.phase !== phase) return {}
@@ -14,30 +14,26 @@ async function extendFrontMatter({
 }
 module.exports.extendFrontMatter = extendFrontMatter
 
-function generateFrontmatterPath(
-  filePath,
-  root
-) {
+function generateFrontmatterPath(filePath, root) {
   const filePathNormalized = normalizeToUnixPath(filePath)
   const dirnameNormalized = normalizeToUnixPath(__dirname)
-  
-  return normalizeToUnixPath(path.join(
-    root,
-    '.mdx-data',
-    `${md5(filePathNormalized.replace(dirnameNormalized, ''))}.json`
-  ))
+
+  return normalizeToUnixPath(
+    path.join(
+      root,
+      '.mdx-data',
+      `${md5(filePathNormalized.replace(dirnameNormalized, ''))}.json`
+    )
+  )
 }
 module.exports.generateFrontmatterPath = generateFrontmatterPath
 
 // md5 hash a string
 function md5(str) {
-  return crypto
-    .createHash('md5')
-    .update(str)
-    .digest('hex')
+  return crypto.createHash('md5').update(str).digest('hex')
 }
 
 function normalizeToUnixPath(str) {
   return str.replace(/\\/g, '/')
 }
-module.exports.normalizeToUnixPath = normalizeToUnixPath 
+module.exports.normalizeToUnixPath = normalizeToUnixPath
