@@ -2,13 +2,13 @@
   "name": "next-mdx-enhanced",
   "description": "Next.js plugin for rendering MDX with layouts and front matter",
   "version": "3.0.0",
+  "bugs": {
+    "url": "https://github.com/hashicorp/next-plugin-mdx-enhanced/issues"
+  },
   "contributors": [
     "Jeff Escalante",
     "Kevin Pruett"
   ],
-  "bugs": {
-    "url": "https://github.com/hashicorp/next-plugin-mdx-enhanced/issues"
-  },
   "dependencies": {
     "@mdx-js/loader": "^1.6.1",
     "debug": "^4.1.1",
@@ -21,8 +21,11 @@
   },
   "devDependencies": {
     "cross-spawn": "^7.0.2",
+    "husky": "^4.2.5",
     "jest": "^26.0.1",
     "next": "^9.4.0",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "rmfr": "^2.0.0",
@@ -37,11 +40,11 @@
     ]
   },
   "keywords": [
+    "front matter",
+    "layout",
     "mdx",
     "nextjs",
-    "plugin",
-    "front matter",
-    "layout"
+    "plugin"
   ],
   "license": "MPL-2.0",
   "main": "index.js",
@@ -50,8 +53,11 @@
     "url": "git+https://github.com/hashicorp/next-plugin-mdx-enhanced.git"
   },
   "scripts": {
+    "lint": "prettier --write \"./**/*.{js,jsx,json}\"",
+    "release:major": "release major && npm publish",
+    "release:minior": "release minior && npm publish",
+    "release:patch": "release patch && npm publish",
     "test": "jest",
-    "test-dev-mode": "cd __tests__/fixtures/basic && next dev",
-    "release": "np"
+    "test-dev-mode": "cd __tests__/fixtures/basic && next dev"
   }
 }
