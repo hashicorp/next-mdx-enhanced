@@ -122,6 +122,8 @@ async function extractFrontMatter(pluginOptions, files, root) {
         .substring(1)
       }
 
+      __resourcePath = normalizeToUnixPath(__resourcePath);
+
       const { data } = matter(content, {
         safeLoad: true,
         filename: files[idx],
