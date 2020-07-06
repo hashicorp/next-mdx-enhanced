@@ -46,8 +46,6 @@ Open the `.gitgnore` file and add the `.mdx-data` diretory:
 
 This directory is populated with cache files as an optimization.
 
-
-
 ## Usage & Options
 
 Open the `next.config.js` file and instantiate it as a Next.js plugin:
