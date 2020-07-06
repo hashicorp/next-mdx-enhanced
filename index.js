@@ -2,7 +2,11 @@ const fs = require('fs-extra')
 const matter = require('gray-matter')
 const path = require('path')
 const PrebuildWebpackPlugin = require('prebuild-webpack-plugin')
-const { generateFrontmatterPath, extendFrontMatter } = require('./util')
+const {
+  generateFrontmatterPath,
+  extendFrontMatter,
+  normalizeToUnixPath,
+} = require('./util')
 const babelPluginFrontmatter = require('./babelPlugin')
 const debug = require('debug')('next-mdx-enhanced')
 
@@ -34,8 +38,10 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   return Object.assign({}, nextConfig, {
     webpack(config, options) {
       // Check whether `src/pages` exists
-      const usesSrc = fs.existsSync(path.join(config.context, '/src/pages'))
-      pluginOptions.usesSrc = usesSrc
+      pluginOptions.usesSrc = fs.existsSync(
+        path.join(config.context, 'src/pages')
+      )
+
       // Add mdx webpack loader stack
       config.module.rules.push({
         test: new RegExp(`\\.(${pluginOptions.fileExtensions.join('|')})$`),
@@ -105,24 +111,14 @@ async function extractFrontMatter(pluginOptions, files, root) {
   debug('start: frontmatter extensions')
   const frontMatter = await Promise.all(
     fileContents.map(async (content, idx) => {
-      // The next steps serve to support placing pages under `src/pages`:
-
-      let __resourcePath = ''
-
-      // 2. Create resource path from file path if using `src/pages`
-      if (pluginOptions.usesSrc) {
-        // Add `src/` to the resource path
-        __resourcePath = files[idx]
-          .replace(path.join(root, 'src/', 'pages'), '')
+      const __resourcePath = normalizeToUnixPath(
+        files[idx]
+          .replace(
+            path.join(root, pluginOptions.usesSrc ? 'src/pages' : 'pages'),
+            ''
+          )
           .substring(1)
-      } else {
-        // Otherwise return default
-        __resourcePath = files[idx]
-          .replace(path.join(root, 'pages'), '')
-          .substring(1)
-      }
-
-      __resourcePath = normalizeToUnixPath(__resourcePath)
+      )
 
       const { data } = matter(content, {
         safeLoad: true,

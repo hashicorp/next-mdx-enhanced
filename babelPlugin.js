@@ -1,4 +1,3 @@
-const fs = require('fs-extra')
 const path = require('path')
 const { generateFrontmatterPath } = require('./util')
 const debug = require('debug')('next-mdx-enhanced')
@@ -32,24 +31,22 @@ module.exports = function nextBabelWrapper(nextConfig, pluginOptions) {
           // here, we're calculating the path
           const currentPath = state.file.opts.filename
 
-          // Get absolute path to page
-          let generatedPath = path.resolve(path.dirname(currentPath), importPath);
+          // Get absolute path to page, ex. root/pages/docs/intro.mdx
+          let generatedPath = path.resolve(
+            path.dirname(currentPath),
+            importPath
+          )
 
-          // 2. Generate alternative path if `src/pages` exists, else use the one generated above
-          if(pluginOptions.usesSrc) {
-            // 2.1 Construct new path 
-            
-            // >/dev/project/src/pages
-            const pathToPagesDirectory = path.join(nextConfig.dir ,'/src/pages');
-            
-            // >src/pages/docs/intro.mdx
-            const pathFromRoot = generatedPath.replace(nextConfig.dir, '');
-            
-            // >/docs/intro.mdx
-            const pathToPage = pathFromRoot.split('pages')[1];
-            
-            // >/dev/project/src/pages/docs/intro.mdx
-            generatedPath = path.join(pathToPagesDirectory, pathToPage);
+          // Generate the path using `src` if `src/pages` exists
+          if (pluginOptions.usesSrc) {
+            // root/src/pages
+            const pathToPagesDirectory = path.join(nextConfig.dir, 'src/pages')
+            // src/pages/docs/intro.mdx
+            const pathFromRoot = generatedPath.replace(nextConfig.dir, '')
+            // docs/intro.mdx
+            const pathToPage = pathFromRoot.split('pages')[1]
+            // root/src/pages/docs/intro.mdx
+            generatedPath = path.join(pathToPagesDirectory, pathToPage)
           }
 
           const frontMatterPath = generateFrontmatterPath(

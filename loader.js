@@ -24,24 +24,14 @@ module.exports = async function mdxEnhancedLoader(src) {
   // Scan for plugin `scan` option to return results based on RegEx patterns provided in config
   const scans = scanContent(options, content)
 
-  const normalizedResourcePath = normalizeToUnixPath(this.resourcePath)
-
-  let pageDirectoryPath = ''
-
-  const { mdxEnhancedUsesSrc: usesSrc } = options
-
-  if (usesSrc) {
-    // 2. Add `src/pages` to root path
-    pageDirectoryPath = normalizeToUnixPath(
-      path.join(normalizeToUnixPath(this.rootContext), 'src/pages')
-    )
-  } else {
-    pageDirectoryPath = normalizeToUnixPath(
-      path.join(normalizeToUnixPath(this.rootContext), 'pages')
-    )
-  }
-
   // Get file path relative to project root
+  const pageDirectoryPath = normalizeToUnixPath(
+    path.join(
+      normalizeToUnixPath(this.rootContext),
+      options.mdxEnhancedUsesSrc ? 'src/pages' : 'pages'
+    )
+  )
+  const normalizedResourcePath = normalizeToUnixPath(this.resourcePath)
   const resourcePath = normalizedResourcePath
     .replace(pageDirectoryPath, '')
     .substring(1)
