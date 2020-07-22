@@ -73,8 +73,8 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
           files: {
             pattern:
               pluginOptions.fileExtensions.length > 1
-                ? `**/*.{${pluginOptions.fileExtensions.join(',')}}`
-                : `**/*.${pluginOptions.fileExtensions[0]}`,
+                ? `pages/**/*.{${pluginOptions.fileExtensions.join(',')}}`
+                : `pages/**/*.${pluginOptions.fileExtensions[0]}`,
             options: { cwd: config.context },
             addFilesAsDependencies: true,
           },
