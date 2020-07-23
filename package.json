@@ -1,7 +1,7 @@
 {
   "name": "next-mdx-enhanced",
   "description": "Next.js plugin for rendering MDX with layouts and front matter",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "bugs": {
     "url": "https://github.com/hashicorp/next-plugin-mdx-enhanced/issues"
   },
