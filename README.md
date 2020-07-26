@@ -292,11 +292,11 @@ withMdxEnhanced({
     {
       someImportantKey: {
         pattern: /<SomeComponent.*name=['"](.*)['"].*\/>/,
-        transform: arr => arr[1] // Optionally get a specific value back via a function;
-				// if `transform` is omitted, any and all matches will be returned in an array
-			}
-    }
-  ]
+        transform: (arr) => arr[1], // Optionally get a specific value back via a function;
+        // if `transform` is omitted, any and all matches will be returned in an array
+      },
+    },
+  ],
 })
 ```
 
