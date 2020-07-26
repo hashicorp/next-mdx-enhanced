@@ -35,7 +35,7 @@ Install the package:
 $ npm install next-mdx-enhanced
 ```
 
-Open the `.gitgnore` file and add the `.mdx-data` diretory:
+Open the `.gitgnore` file and add the `.mdx-data` directory:
 
 ```shell
 # .gitignore
