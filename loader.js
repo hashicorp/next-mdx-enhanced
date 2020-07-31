@@ -31,7 +31,7 @@ module.exports = async function mdxEnhancedLoader(src) {
   const resourcePath = normalizeToUnixPath(this.resourcePath)
     .replace(
       normalizeToUnixPath(
-        path.join(normalizeToUnixPath(this.rootContext), options.mdxEnhancedPluginOptions.usesSrc? 'src/pages': 'pages')
+        path.join(normalizeToUnixPath(this.rootContext), options.mdxEnhancedPluginOptions.pagesDir)
       ),
       ''
     )
