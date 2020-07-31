@@ -10,8 +10,8 @@ const spawn = require('cross-spawn')
 jest.setTimeout(200000)
 
 test('pages in src folder', async () => {
-  const basicFixture = path.join(__dirname, 'fixtures/src-folder')
-  const outPath = await compileNextjs(basicFixture)
+  const srcFolderFixture = path.join(__dirname, 'fixtures/src-folder')
+  const outPath = await compileNextjs(srcFolderFixture)
   expectContentMatch(outPath, 'index.html', /Hello world/)
   expectContentMatch(outPath, 'docs/advanced.html', /<p>LAYOUT TEMPLATE<\/p>/)
   expectContentMatch(outPath, 'docs/advanced.html', /<h1>Advanced Docs<\/h1>/)
