@@ -60,6 +60,7 @@ module.exports = withMdxEnhanced({
   fileExtensions: ['mdx'],
   remarkPlugins: [],
   rehypePlugins: [],
+  usesSrc: false
   extendFrontMatter: {
     process: (mdxContent, frontMatter) => {},
     phase: 'prebuild|loader|both',
@@ -96,6 +97,12 @@ Array of [remark plugins](https://mdxjs.com/advanced/plugins#using-remark-and-re
 > `array` | optional
 
 Array of [rehype plugins](https://mdxjs.com/advanced/plugins#using-remark-and-rehype-plugins) used to transform `.mdx` files.
+
+### usesSrc
+
+> `boolean` | optional | **default: `checks for src/pages to set the flag`**
+
+It dictates if next mdx enhanced should use the src/pages for looking for the pages' folder. Otherwise, it will use the pages in the top-level directory. Also, if not set, it automatically checks for the src/pages directories.
 
 ### extendFrontMatter
 
