@@ -4,14 +4,12 @@ export async function getStaticProps() {
   return { props: {} }
 }
 
-export default function Page(frontMatter) {
-  return function docsPageLayout({ children }) {
-    return (
-      <>
-        <p>LAYOUT TEMPLATE</p>
-        <h1>{frontMatter.title}</h1>
-        {children}
-      </>
-    )
-  }
+export default function docsPageLayout({ children, frontMatter }) {
+  return (
+    <>
+      <p>LAYOUT TEMPLATE</p>
+      <h1>{frontMatter.title}</h1>
+      {children}
+    </>
+  )
 }
