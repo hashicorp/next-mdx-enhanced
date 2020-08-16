@@ -1,5 +1,3 @@
-export default function Page() {
-  return function docsPageLayout({ children }) {
-    return <>{children}</>
-  }
+export default function docsPageLayout({ children }) {
+  return <>{children}</>
 }
