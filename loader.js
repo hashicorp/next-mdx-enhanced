@@ -129,11 +129,13 @@ async function processLayout(
     })
   }
 
-  // Import the layout, export the layout-wrapped content, pass front matter into layout
-  return `import layout from '${normalizeToUnixPath(layoutPath)}'
+  // Import the layout, and apply to content
+  // MDX will pass all module exports as props to the default export
+  return `import Layout from '${normalizeToUnixPath(layoutPath)}'
 
-export * from '${normalizeToUnixPath(layoutPath)}'
-export default layout(${stringifyObject(mergedFrontMatter)})
+export default Layout
+
+export const frontMatter = ${stringifyObject(mergedFrontMatter)}
 
 ${content}
 `
