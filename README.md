@@ -174,7 +174,8 @@ The file extension of the template must be one of configured [pageExtensions](ht
 The template, defined in `layouts/docs-page.jsx`, looks like the following:
 
 ```jsx
-export default ({ children, frontMatter }) => {
+// This function must be named otherwise it disables Fast Refresh.
+export default function DocsPage({ children, frontMatter }) {
   // React hooks, for example `useState` or `useEffect`, go here.
   return (
     <div>
