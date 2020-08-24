@@ -3,7 +3,7 @@ const matter = require('gray-matter')
 const path = require('path')
 const PrebuildWebpackPlugin = require('prebuild-webpack-plugin')
 const { generateFrontmatterPath, extendFrontMatter } = require('./util')
-const babelPluginFrontmatter = require('./babelPlugin')
+const babelPluginFrontmatter = require('./babel-plugin-extract-frontmatter')
 const debug = require('debug')('next-mdx-enhanced')
 
 module.exports = (pluginOptions = {}) => (nextConfig = {}) => {

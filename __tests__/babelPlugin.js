@@ -1,7 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const { transform } = require('@babel/core')
-const plugin = require('../babelPlugin')
+const plugin = require('../babel-plugin-extract-frontmatter')
 
 test('transforms as intended', () => {
   const mockNextOptions = { dir: 'PATH/TO/NEXT/PROJECT' }
