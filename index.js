@@ -91,9 +91,16 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   })
 }
 
-// Given an array of absolute file paths, write out the front matter to a json file
-async function extractFrontMatter(pluginOptions, files, root) {
+// Given an array of file paths, write out the front matter to a json file
+async function extractFrontMatter(
+  pluginOptions,
+  absoluteOrRelativeFilePaths,
+  root
+) {
   debug('start: read all mdx files')
+  const files = absoluteOrRelativeFilePaths.map((filePath) =>
+    path.isAbsolute(filePath) ? filePath : path.resolve(root, filePath)
+  )
   const fileContents = await Promise.all(
     files.map((f) => fs.readFile(f, 'utf8'))
   )
@@ -137,7 +144,7 @@ async function extractFrontMatter(pluginOptions, files, root) {
   debug('start: write data files')
   return Promise.all(
     frontMatter.map((content, idx) => {
-      fs.writeFile(fmPaths[idx], JSON.stringify(content))
+      return fs.writeFile(fmPaths[idx], JSON.stringify(content))
     })
   ).then(() => {
     debug('finish: write data files')
