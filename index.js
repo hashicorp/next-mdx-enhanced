@@ -31,6 +31,10 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
     pluginOptions.extendFrontMatter.phase = 'both'
   }
 
+  if (!pluginOptions.usesSrc) pluginOptions.usesSrc = fs.existsSync(`src/pages`);
+
+  pluginOptions.pagesDir = pluginOptions.usesSrc? `src/pages` : `pages`;
+
   return Object.assign({}, nextConfig, {
     webpack(config, options) {
       // Add mdx webpack loader stack
@@ -73,8 +77,8 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
           files: {
             pattern:
               pluginOptions.fileExtensions.length > 1
-                ? `pages/**/*.{${pluginOptions.fileExtensions.join(',')}}`
-                : `pages/**/*.${pluginOptions.fileExtensions[0]}`,
+                ? `${pluginOptions.pagesDir}/**/*.{${pluginOptions.fileExtensions.join(',')}}`
+                : `${pluginOptions.pagesDir}/**/*.${pluginOptions.fileExtensions[0]}`,
             options: { cwd: config.context },
             addFilesAsDependencies: true,
           },
@@ -110,7 +114,7 @@ async function extractFrontMatter(
   const frontMatter = await Promise.all(
     fileContents.map(async (content, idx) => {
       const __resourcePath = files[idx]
-        .replace(path.join(root, 'pages'), '')
+        .replace(path.join(root, pluginOptions.pagesDir), '')
         .substring(1)
 
       const { data } = matter(content, {
