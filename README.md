@@ -64,6 +64,7 @@ module.exports = withMdxEnhanced({
     process: (mdxContent, frontMatter) => {},
     phase: 'prebuild|loader|both',
   },
+  reExportDataFetching: false,
 })(/* your normal nextjs config */)
 ```
 
@@ -127,6 +128,12 @@ This function runs on each build of an MDX page. All metadata and full text cont
 
 > Useful for indexing your content for site search or any other purpose where
 > you'd like to capture content on build.
+
+### reExportDataFetching
+
+> `boolean` | optional
+
+If you export `getStaticProps` and/or `getServerSideProps` from your layout, and wish for those to be re-exported from each of your mdx pages, set this option to `true`.
 
 ## Layouts
 

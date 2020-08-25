@@ -1,7 +1,11 @@
 const path = require('path')
+const fs = require('fs')
 const matter = require('gray-matter')
 const glob = require('glob')
 const stringifyObject = require('stringify-object')
+const { transformAsync } = require('@babel/core')
+const nextBabel = require('next/babel')
+const pluginDetectExports = require('./babel-plugins-detect-exports')
 const { getOptions } = require('loader-utils')
 const { extendFrontMatter, normalizeToUnixPath } = require('./util')
 
@@ -39,6 +43,7 @@ module.exports = async function mdxEnhancedLoader(src) {
     .then((result) => callback(null, result))
     .catch((err) => callback(err))
 }
+
 function scanContent(options, content) {
   const { mdxEnhancedPluginOptions: pluginOpts } = options
   if (!pluginOpts.scan) return {}
@@ -57,6 +62,7 @@ function scanContent(options, content) {
     return acc
   }, {})
 }
+
 async function processLayout(
   options,
   frontMatter,
@@ -129,11 +135,25 @@ async function processLayout(
     })
   }
 
-  // Import the layout, export the layout-wrapped content, pass front matter into layout
-  return `import layout from '${normalizeToUnixPath(layoutPath)}'
+  // Scan the layout for data fetching method exports if we are re-exporting
+  const namedExports = []
+  if (pluginOpts.reExportDataFetching) {
+    await transformAsync(fs.readFileSync(matches[0], 'utf8'), {
+      presets: [nextBabel],
+      plugins: [pluginDetectExports(namedExports)],
+      filename: layoutPath,
+    })
+  }
 
-export * from '${normalizeToUnixPath(layoutPath)}'
+  // Import the layout, export the layout-wrapped content, pass front matter into layout
+  // If there are re-exported data fetching methods, import/export those as well
+  return `import layout${
+    namedExports &&
+    `, { ${namedExports.map((n) => `${n} as _${n}`).join(', ')} }`
+  } from '${normalizeToUnixPath(layoutPath)}'
+
 export default layout(${stringifyObject(mergedFrontMatter)})
+${namedExports.map((name) => `export const ${name} = _${name}`).join('\n')}
 
 ${content}
 `

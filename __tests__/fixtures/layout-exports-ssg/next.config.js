@@ -1,3 +1,3 @@
 const withMdxEnhanced = require('../../..')
 
-module.exports = withMdxEnhanced()()
+module.exports = withMdxEnhanced({ reExportDataFetching: true })()
