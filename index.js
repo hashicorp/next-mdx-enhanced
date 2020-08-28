@@ -7,7 +7,8 @@ const babelPluginFrontmatter = require('./babel-plugin-extract-frontmatter')
 const debug = require('debug')('next-mdx-enhanced')
 
 module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
-  if (!pluginOptions.layoutPath) pluginOptions.layoutPath = 'layouts'
+  if (!pluginOptions.usesSrc) pluginOptions.usesSrc = fs.existsSync(`src/pages`);
+  if (!pluginOptions.layoutPath) pluginOptions.layoutPath = `${pluginOptions.usesSrc? 'src/':''}layouts`
   if (!pluginOptions.fileExtensions) pluginOptions.fileExtensions = ['mdx']
 
   // This extension list should be kept in sync with the NextJS default:
@@ -30,8 +31,6 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
   ) {
     pluginOptions.extendFrontMatter.phase = 'both'
   }
-
-  if (!pluginOptions.usesSrc) pluginOptions.usesSrc = fs.existsSync(`src/pages`);
 
   pluginOptions.pagesDir = pluginOptions.usesSrc? `src/pages` : `pages`;
 
