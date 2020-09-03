@@ -5,6 +5,8 @@
 Are you using [Next.js](https://github.com/zeit/next.js) with [MDX](https://mdxjs.com) and wanted layouts and [front
 matter](https://jekyllrb.com/docs/front-matter/)? That's exactly what this plugin will do for you! 🌟
 
+> ⚠️ You probably should be using [next-mdx-remote](https://github.com/hashicorp/next-mdx-remote) instead of this library. It is ~50% faster, more flexible with content storage, does not induce memory issues at scale, and fits much better with the way that data is intended to flow through next.js.
+
 For example, if have a site that displays content (e.g. documentation) that looks like:
 
 ```
