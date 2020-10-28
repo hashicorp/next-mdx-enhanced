@@ -55,7 +55,7 @@
   "license": "MPL-2.0",
   "main": "index.js",
   "peerDependencies": {
-    "next": "9.0.x - 9.5.x"
+    "next": "9.0.x - 10.0.x"
   },
   "repository": {
     "type": "git",
