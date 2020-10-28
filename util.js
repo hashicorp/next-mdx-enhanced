@@ -21,7 +21,7 @@ function generateFrontmatterPath(filePath, root) {
   return normalizeToUnixPath(
     path.join(
       root,
-      '.mdx-data',
+      '.next/cache/mdx-data',
       `${md5(filePathNormalized.replace(dirnameNormalized, ''))}.json`
     )
   )
