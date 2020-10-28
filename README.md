@@ -37,17 +37,6 @@ Install the package:
 $ npm install next-mdx-enhanced
 ```
 
-Open the `.gitgnore` file and add the `.mdx-data` directory:
-
-```shell
-# .gitignore
-
-# Ignore next-mdx-enhanced cache directory
-.mdx-data
-```
-
-This directory is populated with cache files as an optimization.
-
 ## Usage & Options
 
 Open the `next.config.js` file and instantiate it as a Next.js plugin:

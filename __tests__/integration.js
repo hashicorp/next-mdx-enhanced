@@ -121,7 +121,6 @@ test('options.onContent', async () => {
 afterAll(() => {
   return Promise.all([
     rmfr(path.join(__dirname, 'fixtures/*/out'), { glob: true }),
-    rmfr(path.join(__dirname, 'fixtures/*/.mdx-data'), { glob: true }),
     rmfr(path.join(__dirname, 'fixtures/*/.next'), { glob: true }),
   ])
 })

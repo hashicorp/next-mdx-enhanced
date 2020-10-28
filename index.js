@@ -31,9 +31,9 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
     pluginOptions.extendFrontMatter.phase = 'both'
   }
 
-  if (!pluginOptions.usesSrc) pluginOptions.usesSrc = fs.existsSync(`src/pages`);
+  if (!pluginOptions.usesSrc) pluginOptions.usesSrc = fs.existsSync(`src/pages`)
 
-  pluginOptions.pagesDir = pluginOptions.usesSrc? `src/pages` : `pages`;
+  pluginOptions.pagesDir = pluginOptions.usesSrc ? `src/pages` : `pages`
 
   return Object.assign({}, nextConfig, {
     webpack(config, options) {
@@ -77,7 +77,9 @@ module.exports = (pluginOptions = {}) => (nextConfig = {}) => {
           files: {
             pattern:
               pluginOptions.fileExtensions.length > 1
-                ? `${pluginOptions.pagesDir}/**/*.{${pluginOptions.fileExtensions.join(',')}}`
+                ? `${
+                    pluginOptions.pagesDir
+                  }/**/*.{${pluginOptions.fileExtensions.join(',')}}`
                 : `${pluginOptions.pagesDir}/**/*.${pluginOptions.fileExtensions[0]}`,
             options: { cwd: config.context },
             addFilesAsDependencies: true,
@@ -142,9 +144,9 @@ async function extractFrontMatter(
   // TODO: remove this catch once this issue has been resolved
   // https://github.com/zeit/next.js/issues/8068
   debug('finish: frontmatter extensions')
-  debug('start: .mdx-data creation')
+  debug('start: mdx-data cache creation')
   await Promise.all(fmPaths.map((fmPath) => fs.ensureDir(path.dirname(fmPath))))
-  debug('finish: .mdx-data creation')
+  debug('finish: mdx-data cache creation')
   debug('start: write data files')
   return Promise.all(
     frontMatter.map((content, idx) => {
