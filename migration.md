@@ -2,58 +2,13 @@
 
 This document needs to be cleaned but I thought this might be better than an infinate issue thread 😉
 
-## General
+## General FAQ
 - I see a lot of `fs` usage in the [with-mdx-remote example](https://github.com/vercel/next.js/tree/canary/examples/with-mdx-remote)
   should this worry me? (as far as I know this is not a browser-supported package and only works locally)
+  - No, any imports used in `getStaticProps` are executed in a node environment at build time and removed from client side output. The [nextjs docs](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) can offer more detail on this.
   
-- I cannot even run the [with-mdx-remote example](https://github.com/vercel/next.js/tree/canary/examples/with-mdx-remote) example what should I do?
-  
-  My steps & issue:
-  ```
-  gh clone vercel/next.js   # uses the github cli
-  cd next.js/examples/with-mdx-remote
-  yarn  # install dependencies
-  yarn add --dev eslint eslint-config-next  # to be able to use nextjs 11
-  yarn build  # 👈 Exception time
-  ```
-  
-  The exception:
-  ```
-  yarn run v1.22.4
-  $ next build
-  info  - Using webpack 5. Reason: Enabled by default https://nextjs.org/docs/messages/webpack5
-  info  - Checking validity of types
-  
-  > Build error occurred
-  Error: Failed to load plugin 'jest' declared in '..\..\.eslintrc.json#overrides[0]': Cannot find module 'eslint-plugin-jest'
-  Require stack:
-  - C:\workspace\next.js\__placeholder__.js
-  Referenced from: C:\workspace\next.js\.eslintrc.json
-      at Function.Module._resolveFilename (internal/modules/cjs/loader.js:885:15)
-      at Function.resolve (internal/modules/cjs/helpers.js:94:19)
-      at Object.resolve (C:\workspace\next.js\examples\with-mdx-remote\node_modules\@eslint\eslintrc\lib\shared\relative-module-resolver.js:28:50)
-      at ConfigArrayFactory._loadPlugin (C:\workspace\next.js\examples\with-mdx-remote\node_modules\@eslint\eslintrc\lib\config-array-factory.js:1017:39)
-      at ConfigArrayFactory._loadExtendedPluginConfig (C:\workspace\next.js\examples\with-mdx-remote\node_modules\@eslint\eslintrc\lib\config-array-factory.js:837:29)
-      at ConfigArrayFactory._loadExtends (C:\workspace\next.js\examples\with-mdx-remote\node_modules\@eslint\eslintrc\lib\config-array-factory.js:779:29)
-      at ConfigArrayFactory._normalizeObjectConfigDataBody (C:\workspace\next.js\examples\with-mdx-remote\node_modules\@eslint\eslintrc\lib\config-array-factory.js:720:25)
-      at _normalizeObjectConfigDataBody.next (<anonymous>)
-      at ConfigArrayFactory._normalizeObjectConfigData (C:\workspace\next.js\examples\with-mdx-remote\node_modules\@eslint\eslintrc\lib\config-array-factory.js:665:20)
-      at _normalizeObjectConfigData.next (<anonymous>) {
-    type: 'Error',
-    code: 'MODULE_NOT_FOUND',
-    requireStack: [ 'C:\\workspace\\next.js\\__placeholder__.js' ],
-    messageTemplate: 'plugin-missing',
-    messageData: {
-      pluginName: 'eslint-plugin-jest',
-      resolvePluginsRelativeTo: 'C:\\workspace\\next.js',
-      importerName: '..\\..\\.eslintrc.json#overrides[0]'
-    }
-  }
-  error Command failed with exit code 1.
-  info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
-  ```
-  
-  (and running `yarn add --dev eslint-plugin-jest` doesn't change the issue).
+- I cannot even run the [with-mdx-remote example](https://github.com/vercel/next.js/tree/canary/examples/with-mdx-remote) example what should I do? 
+  - At this point (28-06-2021) the example runs if you disable eslint in next.config.js. The error message should contain the method to do this.
   
 ## Migration
 
@@ -75,7 +30,7 @@ module.exports = withMdxEnhanced({
 })
 ```
 
-`next-mdx-remote` doesn't have a similar wrapping of the next.js config. Therefore you can simply replace this with something like the following.
+`next-mdx-remote` doesn't have a similar wrapping of the next.js config. Therefore, you can simply replace this with something like the following.
 
 ```js
 /* possibly some remaining imports */
