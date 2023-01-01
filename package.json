@@ -30,7 +30,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "rmfr": "^2.0.0",
-    "webpack": "^4.44.1"
+    "webpack": "^5.75.0"
   },
   "homepage": "https://github.com/hashicorp/next-plugin-mdx-enhanced#readme",
   "husky": {
