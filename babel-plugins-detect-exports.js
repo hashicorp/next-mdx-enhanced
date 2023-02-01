@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) HashiCorp, Inc.
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 module.exports = function babelWrapper(metadata) {
   return function frontMatterExtractionPlugin({ types: t }) {
     return {

@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) HashiCorp, Inc.
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 const path = require('path')
 const { generateFrontmatterPath } = require('./util')
 const debug = require('debug')('next-mdx-enhanced')
