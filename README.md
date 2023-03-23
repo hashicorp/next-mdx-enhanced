@@ -1,3 +1,7 @@
+> **Note**
+> This repository is no longer maintained or in-use at HashiCorp. As of March 2023, the repository is archived.
+
+
 # Next.js + MDX Enhanced
 
 [![build status](https://img.shields.io/circleci/build/github/hashicorp/next-mdx-enhanced.svg?style=flat-square)](https://circleci.com/gh/hashicorp/next-mdx-enhanced)
